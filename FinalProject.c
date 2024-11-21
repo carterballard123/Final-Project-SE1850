@@ -39,15 +39,14 @@ void searchCharacter(struct Character *head, char *searchName); //searches for a
 
 int main(){
 
-char searchCharacterName[50]; // Array to store name for searching
-char updateName[50]; // Array to store name for updating
-char deleteName[50]; // Array to store name for deleting
+char searchCharacterName[50]; //Array to store name for searching
+char updateCharacterName[50]; //Array to store name for updating
+char deleteCharacterName[50]; //Array to store name for deleting
 
 int choice; //users choice
 struct Character *characterList = NULL;
 
-do
-{
+do{
     //menu options
     printf("\nYour DnD Characters!\n");
     printf("1. Add a new character\n");
@@ -75,7 +74,9 @@ do
     }
 
     if(choice == 4){
-
+        printf("Enter the name of your character to update: ");
+        scanf("%s", updateCharacterName); 
+        updateStudent(characterList, updateCharacterName);
     }
     if(choice == 5){
 
@@ -277,12 +278,12 @@ else if(strcmp(armor, "hide_armor")){
 }
 
 //Searches for a character by name
-void searchCharacter(struct Character *head, char *searchName) {
+void searchCharacter(struct Character *head, char *searchName){
     int ifFound = 0;
 
-    while (head != NULL) {
-        if (strcmp(head->name, searchName) == 0) {
-            printf("Character has been found:\n");
+    while(head != NULL){
+        if (strcmp(head->name, searchName) == 0){
+            printf("Your character has been found:\n\n");
             printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
             printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
             printf("Armor Class: %d     Speed (ft): %d\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
@@ -298,7 +299,63 @@ void searchCharacter(struct Character *head, char *searchName) {
         head = head->next;
     }
 
-    if (ifFound != 1) {
-        printf("Character could not found.\n");
+    if(ifFound != 1){
+        printf("Your character could not found :(\n\n");
     }
+}
+
+//Function to update details of a student
+void updateStudent(struct Character *head, char *updateName){
+
+    while (head != NULL){
+        if (strcmp(head->name, updateName) == 0){
+            printf("Enter updated details for student %s:\n", updateName);
+            printf("Enter your characters level: ");
+            scanf("%d", &head->level); 
+
+            printf("Enter your characters class: ");
+            scanf("%s", head->class); 
+
+            printf("Enter your characters background: ");
+            scanf("%s", head->background); 
+
+            printf("Enter your characters race: ");
+            scanf("%s", head->race); 
+
+            printf("Enter your characters alignment: ");
+            scanf("%s", head->alignment); 
+
+            printf("Enter your characters strength value (8-20): ");
+            scanf("%d", &head->strength); 
+
+            printf("Enter your characters dexterity value (8-20): ");
+            scanf("%d", &head->dexterity); 
+
+            printf("Enter your characters constitution value (8-20): ");
+            scanf("%d", &head->constitution); 
+
+            printf("Enter your characters intelligence value (8-20): ");
+            scanf("%d", &head->intelligence); 
+
+            printf("Enter your characters wisdom value (8-20): ");
+            scanf("%d", &head->wisdom); 
+
+            printf("Enter your characters charisma value (8-20): ");
+            scanf("%d", &head->charisma); 
+
+            printf("Enter your characters movement speed: ");
+            scanf("%d", &head->speed); 
+
+            printf("Enter your characters armor: \n (Some examples include 'unarmored', 'plate_armor', 'hide_armor', 'half_plate_armor')");
+            scanf("%s", head->armor); 
+
+            printf("Does your character have a shield? (1 for yes 0 for no):");
+            scanf("%d", &head->hasShield); 
+            printf("Character details have updated successfully.\n\n");
+            return;
+        }
+        head = head->next;
+    }
+
+    printf("Character could not be found :( \n\n");
 }
