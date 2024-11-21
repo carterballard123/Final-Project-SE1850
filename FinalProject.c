@@ -28,16 +28,20 @@ struct Character {
 
 //calculate functions
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
-int calculateArmorClass(int dexterity, const char *armor, bool hasShield);
+int calculateArmorClass(int dexterity, const char *armor, int hasShield);
 
 
 //display functions
 void addCharacter(struct Character **head); //adds new character to character list
 void displayCharacter(struct Character *head); //displays your characters
-
+void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
 
 
 int main(){
+
+char searchCharacterName[50]; // Array to store name for searching
+char updateName[50]; // Array to store name for updating
+char deleteName[50]; // Array to store name for deleting
 
 int choice; //users choice
 struct Character *characterList = NULL;
@@ -59,8 +63,25 @@ do
     if(choice == 1){
         addCharacter(&characterList);
     }
+
     if(choice == 2){
         displayCharacter(characterList);
+    }
+
+    if(choice == 3){
+        printf("Enter the name of the character to search for: ");
+        scanf("%s", searchCharacterName);
+        searchCharacter(characterList, searchCharacterName); 
+    }
+
+    if(choice == 4){
+
+    }
+    if(choice == 5){
+
+    }
+    if(choice == 6){
+        printf("Exiting DnD Character Creator...\n");
     }
 } while(choice != 6);
 
@@ -88,7 +109,7 @@ void addCharacter(struct Character **head){
     }
 
     //prompt user to enter details for character
-    printf("For more information regarding DnD character details visit DnD Beyond\n");
+    printf("For more information regarding DnD character details visit DnD Beyond\n\n");
     printf("Enter your characters name: ");
     scanf("%s", newCharacter->name); 
 
@@ -217,7 +238,7 @@ else{
 }
 
 
-int calculateArmorClass(int dexterity, const char *armor, bool hasShield){
+int calculateArmorClass(int dexterity, const char *armor, int hasShield){
 
 int addArmorClass; //temporary variable
 
@@ -255,3 +276,29 @@ else if(strcmp(armor, "hide_armor")){
 
 }
 
+//Searches for a character by name
+void searchCharacter(struct Character *head, char *searchName) {
+    int ifFound = 0;
+
+    while (head != NULL) {
+        if (strcmp(head->name, searchName) == 0) {
+            printf("Character has been found:\n");
+            printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
+            printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
+            printf("Armor Class: %d     Speed (ft): %d\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
+            printf("Strength\nAbility Score: %d\nModifier: %d\n\n", head->strength, calculateModifier(head->strength));                          //displays Strength
+            printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", head->dexterity, calculateModifier(head->dexterity));                       //displays Dexterity 
+            printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", head->constitution, calculateModifier(head->constitution));              //displays Constitution
+            printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", head->intelligence, calculateModifier(head->intelligence));              //displays Intelligence
+            printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", head->wisdom, calculateModifier(head->wisdom));                                //displays Wisdom
+            printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", head->charisma, calculateModifier(head->charisma));                          //displays Charisma
+            ifFound = 1;
+            break;
+        }
+        head = head->next;
+    }
+
+    if (ifFound != 1) {
+        printf("Character could not found.\n");
+    }
+}
