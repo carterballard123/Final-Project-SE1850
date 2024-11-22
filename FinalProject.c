@@ -4,6 +4,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 struct Character {
     char name[50]; //character name
@@ -35,9 +36,13 @@ int calculateArmorClass(int dexterity, const char *armor, int hasShield);
 void addCharacter(struct Character **head); //adds new character to character list
 void displayCharacter(struct Character *head); //displays your characters
 void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
-
+void updateStudent(struct Character *head, char *updateCharacterName); //updates an existing character with new data
+void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
+void rollD20(); //rolls a D20
 
 int main(){
+
+srand(time(NULL)); //seeds a random number
 
 char searchCharacterName[50]; //Array to store name for searching
 char updateCharacterName[50]; //Array to store name for updating
@@ -54,7 +59,8 @@ do{
     printf("3. Search for character\n");
     printf("4. Update character\n");
     printf("5. Delete character\n");
-    printf("6. Exit\n");
+    printf("6. Roll a D20\n");
+    printf("7. Exit\n");
     printf("Enter your choice: ");
     scanf("%d", &choice); //user's choice
 
@@ -84,9 +90,12 @@ do{
         deleteCharacter(&characterList, deleteCharacterName); 
     }
     if(choice == 6){
+        rollD20();
+    }
+    if(choice == 7){
         printf("Exiting DnD Character Creator...\n");
     }
-} while(choice != 6);
+} while(choice != 7);
 
 
 struct Character *temp;
@@ -363,7 +372,7 @@ void updateStudent(struct Character *head, char *updateCharacterName){
 }
 
 //Deletes a student from the list
-void deleteCharacter(struct Character **head, char *deleteCharacterName) {
+void deleteCharacter(struct Character **head, char *deleteCharacterName){
     struct Character *prev = NULL;
 
     struct Character *temp = *head;
@@ -389,3 +398,10 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName) {
     printf("Your character has been deleted...\n\n");
 }
 
+
+void rollD20(){
+
+    int rolledNum = rand() % 20 + 1;
+
+    printf("You rolled a %d!", rolledNum);
+}
