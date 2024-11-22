@@ -62,8 +62,9 @@ do{
     printf("3. Search for character\n");
     printf("4. Update character\n");
     printf("5. Delete character\n");
-    printf("6. Roll a D20\n");
-    printf("7. Exit\n");
+    printf("6. Roll a D20 with modifiers\n");
+    printf("7. Roll a D20\n");
+    printf("8. Exit Dnd Character Creator\n");
     printf("Enter your choice: ");
     scanf("%d", &choice); //user's choice
 
@@ -109,9 +110,12 @@ do{
         printf("You rolled: %d\n\n", calculateRollModifier(characterList, diceCharacterName, numChoice));
     }
     if(choice == 7){
+        printf("You rolled: %d", rollD20());
+    }
+    if(choice == 8){
         printf("Exiting DnD Character Creator...\n");
     }
-} while(choice != 7);
+} while(choice != 8);
 
 
 struct Character *temp;
@@ -204,7 +208,7 @@ void displayCharacter(struct Character *head){
         printf("    ___________ Name: %s ___________\n\n", head->name);
         printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
         printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
-        printf("Armor Class: %d     Speed (ft): %d\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
+        printf("Armor Class: %d     Speed: %dft\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
         printf("Strength\nAbility Score: %d\nModifier: %d\n\n", head->strength, calculateModifier(head->strength));                          //displays Strength
         printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", head->dexterity, calculateModifier(head->dexterity));                       //displays Dexterity 
         printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", head->constitution, calculateModifier(head->constitution));              //displays Constitution
@@ -354,7 +358,7 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
             printf("Your character has been found:\n\n");
             printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
             printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
-            printf("Armor Class: %d     Speed (ft): %d\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
+            printf("Armor Class: %d     Speed: %dft\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
             printf("Strength\nAbility Score: %d\nModifier: %d\n\n", head->strength, calculateModifier(head->strength));                          //displays Strength
             printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", head->dexterity, calculateModifier(head->dexterity));                       //displays Dexterity 
             printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", head->constitution, calculateModifier(head->constitution));              //displays Constitution
@@ -457,6 +461,5 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
 
 
 int rollD20(){
-    int rolledNum = rand() % 20 + 1;
-    return rolledNum;
+    return rand() % 20 + 1;
 }
