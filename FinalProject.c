@@ -79,7 +79,9 @@ do{
         updateStudent(characterList, updateCharacterName);
     }
     if(choice == 5){
-
+        printf("Enter the name of the student to delete: ");
+        scanf("%s", deleteCharacterName); 
+        deleteCharacter(&characterList, deleteCharacterName); 
     }
     if(choice == 6){
         printf("Exiting DnD Character Creator...\n");
@@ -278,11 +280,11 @@ else if(strcmp(armor, "hide_armor")){
 }
 
 //Searches for a character by name
-void searchCharacter(struct Character *head, char *searchName){
+void searchCharacter(struct Character *head, char *searchCharacterName){
     int ifFound = 0;
 
     while(head != NULL){
-        if (strcmp(head->name, searchName) == 0){
+        if (strcmp(head->name, searchCharacterName) == 0){
             printf("Your character has been found:\n\n");
             printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
             printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
@@ -304,12 +306,12 @@ void searchCharacter(struct Character *head, char *searchName){
     }
 }
 
-//Function to update details of a student
-void updateStudent(struct Character *head, char *updateName){
+//Updates details of your character
+void updateStudent(struct Character *head, char *updateCharacterName){
 
     while (head != NULL){
-        if (strcmp(head->name, updateName) == 0){
-            printf("Enter updated details for student %s:\n", updateName);
+        if (strcmp(head->name, updateCharacterName) == 0){
+            printf("Enter updated details for student %s:\n", updateCharacterName);
             printf("Enter your characters level: ");
             scanf("%d", &head->level); 
 
@@ -359,3 +361,31 @@ void updateStudent(struct Character *head, char *updateName){
 
     printf("Character could not be found :( \n\n");
 }
+
+//Deletes a student from the list
+void deleteCharacter(struct Character **head, char *deleteCharacterName) {
+    struct Character *prev = NULL;
+
+    struct Character *temp = *head;
+
+    while(temp != NULL && strcmp(temp->name, deleteCharacterName) != 0){
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if(temp == NULL){
+        printf("Your character could not be found :(\n\n");
+        return;
+    }
+
+    if(prev == NULL){
+        *head = temp->next;
+    } 
+    else{
+        prev->next = temp->next;
+    }
+
+    free(temp);
+    printf("Your character has been deleted...\n\n");
+}
+
