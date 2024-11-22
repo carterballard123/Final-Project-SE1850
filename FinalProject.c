@@ -38,7 +38,8 @@ void displayCharacter(struct Character *head); //displays your characters
 void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
 void updateCharacter(struct Character *head, char *updateCharacterName); //updates an existing character with new data
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
-void rollD20(); //rolls a D20
+int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice);
+int rollD20(); //rolls a D20
 
 int main(){
 
@@ -47,13 +48,15 @@ srand(time(NULL)); //seeds a random number
 char searchCharacterName[50]; //Array to store name for searching
 char updateCharacterName[50]; //Array to store name for updating
 char deleteCharacterName[50]; //Array to store name for deleting
+char diceCharacterName[50];  //Array to store name for dice rolling
 
 int choice; //users choice
+int numChoice; //users choice for dice roll
 struct Character *characterList = NULL;
 
 do{
     //menu options
-    printf("\nYour DnD Characters!\n");
+    printf("\nWelcome to the DnD Character Creator!\n\n");
     printf("1. Add a new character\n");
     printf("2. Display character\n");
     printf("3. Search for character\n");
@@ -90,7 +93,20 @@ do{
         deleteCharacter(&characterList, deleteCharacterName); 
     }
     if(choice == 6){
-        rollD20();
+        printf("Enter the name of your character: ");
+        scanf("%s", diceCharacterName); 
+        printf("Enter which modifier to add on to your roll:\n");
+        printf("1. Strength\n");
+        printf("2. Dexterity\n");
+        printf("3. Constitution\n");
+        printf("4. Intelligence\n");
+        printf("5. Wisdom\n");
+        printf("6. Charisma\n");
+        printf("7. None\n");
+        printf("Enter your choice: ");
+        scanf("%d", &numChoice); //user's choice
+
+        printf("You rolled: %d\n\n", calculateRollModifier(characterList, diceCharacterName, numChoice));
     }
     if(choice == 7){
         printf("Exiting DnD Character Creator...\n");
@@ -288,6 +304,47 @@ else if(strcmp(armor, "hide_armor") == 0){
 return 10;
 }
 
+
+int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice){
+
+    //check to see if list is empty
+    if(head == NULL){ 
+        return 0;
+    }
+    
+    if (strcmp(head->name, diceCharacterName) == 0){
+        if(numChoice > 6 || numChoice < 1){
+            return 0;
+        }
+        else if(numChoice == 1){
+            return rollD20() + calculateModifier(head->strength);
+        }
+        else if(numChoice == 2){
+                return rollD20() + calculateModifier(head->dexterity);
+        }
+        else if(numChoice == 3){
+                return rollD20() + calculateModifier(head->constitution);
+        }
+         else if(numChoice == 4){
+            return rollD20() + calculateModifier(head->intelligence);
+        }
+        else if(numChoice == 5){
+            return rollD20() + calculateModifier(head->wisdom);
+        }
+        else if(numChoice == 6){
+            return rollD20() + calculateModifier(head->charisma);
+        }
+        else if(numChoice == 7){
+            return rollD20();
+        }
+        else{
+        return 0;
+        }
+    }
+    return 0;
+    }
+
+
 //Searches for a character by name
 void searchCharacter(struct Character *head, char *searchCharacterName){
     int ifFound = 0;
@@ -399,9 +456,7 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
 }
 
 
-void rollD20(){
-
+int rollD20(){
     int rolledNum = rand() % 20 + 1;
-
-    printf("You rolled a %d!", rolledNum);
+    return rolledNum;
 }
