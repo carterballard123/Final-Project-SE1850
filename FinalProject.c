@@ -36,7 +36,7 @@ int calculateArmorClass(int dexterity, const char *armor, int hasShield);
 void addCharacter(struct Character **head); //adds new character to character list
 void displayCharacter(struct Character *head); //displays your characters
 void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
-void updateStudent(struct Character *head, char *updateCharacterName); //updates an existing character with new data
+void updateCharacter(struct Character *head, char *updateCharacterName); //updates an existing character with new data
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
 void rollD20(); //rolls a D20
 
@@ -82,10 +82,10 @@ do{
     if(choice == 4){
         printf("Enter the name of your character to update: ");
         scanf("%s", updateCharacterName); 
-        updateStudent(characterList, updateCharacterName);
+        updateCharacter(characterList, updateCharacterName);
     }
     if(choice == 5){
-        printf("Enter the name of the student to delete: ");
+        printf("Enter the name of your character to delete: ");
         scanf("%s", deleteCharacterName); 
         deleteCharacter(&characterList, deleteCharacterName); 
     }
@@ -269,7 +269,7 @@ if(strcmp(armor, "unarmored") == 0){
 else if(strcmp(armor, "plate_armor") == 0){
     return 18 + addArmorClass;
 }
-else if(strcmp(armor, "hide_armor")){
+else if(strcmp(armor, "hide_armor") == 0){
     if(calculateModifier(dexterity) > 2){
         return 14 + addArmorClass;
     }
@@ -277,7 +277,7 @@ else if(strcmp(armor, "hide_armor")){
         return 12 + calculateModifier(dexterity) + addArmorClass;
     }
     }
-    else if(strcmp(armor, "half_plate_armor")){
+    else if(strcmp(armor, "half_plate_armor") == 0){
          if(calculateModifier(dexterity) > 2){
         return 17 + addArmorClass;
     }
@@ -285,7 +285,7 @@ else if(strcmp(armor, "hide_armor")){
         return 15 + calculateModifier(dexterity) + addArmorClass;
     }
     }
-
+return 10;
 }
 
 //Searches for a character by name
@@ -316,11 +316,11 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
 }
 
 //Updates details of your character
-void updateStudent(struct Character *head, char *updateCharacterName){
+void updateCharacter(struct Character *head, char *updateCharacterName){
 
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
-            printf("Enter updated details for student %s:\n", updateCharacterName);
+            printf("Enter updated details for your character: %s:\n", updateCharacterName);
             printf("Enter your characters level: ");
             scanf("%d", &head->level); 
 
@@ -371,7 +371,7 @@ void updateStudent(struct Character *head, char *updateCharacterName){
     printf("Character could not be found :( \n\n");
 }
 
-//Deletes a student from the list
+//Deletes a character from the list
 void deleteCharacter(struct Character **head, char *deleteCharacterName){
     struct Character *prev = NULL;
 
