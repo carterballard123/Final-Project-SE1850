@@ -45,6 +45,7 @@ int rollD20(); //rolls a D20
 //character creater functions
 char *pickClass(int userChoice); //via user input returns your characters class
 char *pickBackground(int userChoice); //via user input returns your characters background
+char *pickRace(int userChoice); //via user input returns your characters race
 
 int main(){
 
@@ -141,6 +142,8 @@ void addCharacter(struct Character **head){
     struct Character *newCharacter = (struct Character *)malloc(sizeof(struct Character));
     int usersClass;
     int usersBackground;
+    int usersRace;
+
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
         exit(1);
@@ -190,8 +193,19 @@ void addCharacter(struct Character **head){
     scanf("%d", &usersBackground); 
     strcpy(newCharacter->background, pickBackground(usersBackground));
 
-    printf("Enter your characters race: ");
-    scanf("%s", newCharacter->race); 
+    printf("Enter your characters race:\n");
+    printf("1. Aasimar\n");
+    printf("2. Dragonborn\n");
+    printf("3. Dwarf\n");
+    printf("4. Elf\n");
+    printf("5. Gnome\n");
+    printf("6. Goliath\n");
+    printf("7. Halfling\n");
+    printf("8. Human\n");
+    printf("9. Orc\n");
+    printf("10. Tiefling\n");
+    scanf("%d", &usersRace); 
+    strcpy(newCharacter->race, pickRace(usersRace));
 
     printf("Enter your characters alignment: ");
     scanf("%s", newCharacter->alignment); 
@@ -416,6 +430,8 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
 void updateCharacter(struct Character *head, char *updateCharacterName){
 int usersClass;
 int usersBackground;
+int usersRace;
+
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
             printf("Enter updated details for your character: %s:\n", updateCharacterName);
@@ -454,12 +470,23 @@ int usersBackground;
             printf("13. Sailor\n");
             printf("14. Scribe\n");
             printf("15. Soldier\n");
-            printf("4. Wayfarer\n");
+            printf("16. Wayfarer\n");
             scanf("%d", &usersBackground); 
             strcpy(head->background, pickBackground(usersBackground));
 
-            printf("Enter your characters race: ");
-            scanf("%s", head->race); 
+            printf("Enter your characters race:\n");
+            printf("1. Aasimar\n");
+            printf("2. Dragonborn\n");
+            printf("3. Dwarf\n");
+            printf("4. Elf\n");
+            printf("5. Gnome\n");
+            printf("6. Goliath\n");
+            printf("7. Halfling\n");
+            printf("8. Human\n");
+            printf("9. Orc\n");
+            printf("10. Tiefling\n");
+            scanf("%d", &usersRace); 
+            strcpy(head->race, pickRace(usersRace));
 
             printf("Enter your characters alignment: ");
             scanf("%s", head->alignment); 
@@ -577,6 +604,28 @@ char *pickBackground(int userChoice){
         case 14: return "Scribe";
         case 15: return "Soldier";
         case 16: return "Wayfarer";
+       
+        default: return "Unknown"; // defaults to Unknown for invalid choice
+    }
+}
+
+char *pickRace(int userChoice){
+// if user did not enter in a valid response
+    if(userChoice < 1 || userChoice > 16){
+        return "Unknown";
+    }
+// depending on how user responds it will return a string of whatever class is picked
+    switch (userChoice) {
+        case 1: return "Aasimar";
+        case 2: return "Dragonborn";
+        case 3: return "Dwarf";
+        case 4: return "Elf";
+        case 5: return "Gnome";
+        case 6: return "Goliath";
+        case 7: return "Halfling";
+        case 8: return "Human";
+        case 9: return "Orc";
+        case 10: return "Tiefling";
        
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
