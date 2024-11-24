@@ -47,8 +47,9 @@ char *pickClass(int userChoice); //via user input returns your characters class
 char *pickBackground(int userChoice); //via user input returns your characters background
 char *pickRace(int userChoice); //via user input returns your characters race
 char *pickAlignment(int userChoice); //via user input returns your characters alignment
+char *pickArmor(int userChoice); //via user input returns your characters armor (if any)
 
-int main(){
+int main(int argc, char *argv[]){
 
 srand(time(NULL)); //seeds a random number
 
@@ -145,6 +146,7 @@ void addCharacter(struct Character **head){
     int usersBackground;
     int usersRace;
     int usersAlignment;
+    int usersArmor;
 
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
@@ -240,15 +242,29 @@ void addCharacter(struct Character **head){
     printf("Enter your characters charisma value (8-20): ");
     scanf("%d", &newCharacter->charisma); 
 
-    printf("Enter your characters movement speed: ");
-    scanf("%d", &newCharacter->speed); 
-
-    printf("Enter your characters armor: \n (Some examples include 'unarmored', 'plate_armor', 'hide_armor', 'half_plate_armor')");
-    scanf("%s", newCharacter->armor); 
+    printf("Enter your characters armor: \n");
+    printf("1. Unarmored\n");
+    printf("___Light Armor___\n");
+    printf("2. Padded Armor\n");
+    printf("3. Leather Armor\n");
+    printf("4. Studded Leather Armor\n");
+    printf("___Medium Armor___\n");
+    printf("5. Hide Armor\n");
+    printf("6. Chain Shirt Armor\n");
+    printf("7. Scale Mail Armor\n");
+    printf("8. Breastplate Armor\n");
+    printf("9. Half Plate Armor\n");
+    printf("___Heavy Armor___\n");
+    printf("10. Ring Mail Armor\n");
+    printf("11. Chain Mail Armor\n");
+    printf("12. Splint Armor\n");
+    printf("13. Plate Armor\n");
+    scanf("%d", &usersArmor); 
+    strcpy(newCharacter->armor, pickArmor(usersArmor));
 
     printf("Does your character have a shield? (1 for yes 0 for no):");
     scanf("%d", &newCharacter->hasShield); 
-
+    newCharacter->speed = 30;
     //inserts the new character at the beginning of the list
     newCharacter->next = *head;
     *head = newCharacter;
@@ -270,12 +286,12 @@ void displayCharacter(struct Character *head){
         printf("    ___________ Name: %s ___________\n\n", head->name);
         printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
         printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
-        printf("Armor Class: %d     Speed: %dft\n\n", calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
+        printf("Armor: %s   Armor Class: %d     Speed: %dft\n\n", head->armor, calculateArmorClass(head->dexterity, head->armor, head->hasShield), head->speed);   //displays Armor Class, Speed
         printf("Strength\nAbility Score: %d\nModifier: %d\n\n", head->strength, calculateModifier(head->strength));                          //displays Strength
         printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", head->dexterity, calculateModifier(head->dexterity));                       //displays Dexterity 
         printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", head->constitution, calculateModifier(head->constitution));              //displays Constitution
         printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", head->intelligence, calculateModifier(head->intelligence));              //displays Intelligence
-        printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", head->wisdom, calculateModifier(head->wisdom));                               //displays Wisdom
+        printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", head->wisdom, calculateModifier(head->wisdom));                                //displays Wisdom
         printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", head->charisma, calculateModifier(head->charisma));                          //displays Charisma
         head = head->next;
     }
@@ -334,9 +350,9 @@ else{
 
 int calculateArmorClass(int dexterity, const char *armor, int hasShield){
 
-int addArmorClass; //temporary variable
+int addArmorClass; //if character has a shiled than they gain a +2 to armor class
+int maxDexterity; //some armor only allows a max of +2 from your dexterity modifier
 
-//if character has a shiled than they gain a +2 to armor class
 if(hasShield == 0){
     addArmorClass = 0;
 }
@@ -344,30 +360,58 @@ else{
     addArmorClass = 2;
 }
 
+if(calculateModifier(dexterity) > 2){
+maxDexterity = 2;
+}
+else{
+    maxDexterity = calculateModifier(dexterity);
+}
+
 //Calculates armor class based on what kind of armor, dexterity, and if they have a shield
-if(strcmp(armor, "unarmored") == 0){
+if(strcmp(armor, "Unarmored") == 0){
     return 10 + calculateModifier(dexterity) + addArmorClass;
 }
-else if(strcmp(armor, "plate_armor") == 0){
+//light armor
+if(strcmp(armor, "Padded Armor") == 0){
+    return 11 + calculateModifier(dexterity) + addArmorClass;
+}
+if(strcmp(armor, "Leather Armor") == 0){
+    return 11 + calculateModifier(dexterity) + addArmorClass;
+}
+if(strcmp(armor, "Studded Leather") == 0){
+    return 12 + calculateModifier(dexterity) + addArmorClass;
+}
+//medium armor
+if(strcmp(armor, "Hide Armor") == 0){
+    return 12 + maxDexterity + addArmorClass;
+}
+if(strcmp(armor, "Chain Shirt Armor") == 0){
+    return 13 + maxDexterity + addArmorClass;
+}
+if(strcmp(armor, "Scale Mail Armor") == 0){
+    return 14 + maxDexterity + addArmorClass;
+}
+if(strcmp(armor, "Breastplate Armor") == 0){
+    return 14 + maxDexterity + addArmorClass;
+}
+if(strcmp(armor, "Half Plate Armor") == 0){
+    return 15 + maxDexterity + addArmorClass;
+}
+//heavy armor
+if(strcmp(armor, "Ring Mail Armor") == 0){
+    return 14 +  addArmorClass;
+}
+if(strcmp(armor, "Chain Mail Armor") == 0){
+    return 16 + addArmorClass;
+}
+if(strcmp(armor, "Splint Armor") == 0){
+    return 17 + addArmorClass;
+}
+if(strcmp(armor, "Plate Armor") == 0){
     return 18 + addArmorClass;
 }
-else if(strcmp(armor, "hide_armor") == 0){
-    if(calculateModifier(dexterity) > 2){
-        return 14 + addArmorClass;
-    }
-    else{
-        return 12 + calculateModifier(dexterity) + addArmorClass;
-    }
-    }
-    else if(strcmp(armor, "half_plate_armor") == 0){
-         if(calculateModifier(dexterity) > 2){
-        return 17 + addArmorClass;
-    }
-    else{
-        return 15 + calculateModifier(dexterity) + addArmorClass;
-    }
-    }
-return 10;
+printf("Invlaid armor type\n");
+return 10; //deafults to 10
 }
 
 
@@ -380,36 +424,21 @@ int calculateRollModifier(struct Character *head, char *diceCharacterName, int n
     
     if (strcmp(head->name, diceCharacterName) == 0){
         if(numChoice > 6 || numChoice < 1){
-            return 0;
-        }
-        else if(numChoice == 1){
-            return rollD20() + calculateModifier(head->strength);
-        }
-        else if(numChoice == 2){
-                return rollD20() + calculateModifier(head->dexterity);
-        }
-        else if(numChoice == 3){
-                return rollD20() + calculateModifier(head->constitution);
-        }
-         else if(numChoice == 4){
-            return rollD20() + calculateModifier(head->intelligence);
-        }
-        else if(numChoice == 5){
-            return rollD20() + calculateModifier(head->wisdom);
-        }
-        else if(numChoice == 6){
-            return rollD20() + calculateModifier(head->charisma);
-        }
-        else if(numChoice == 7){
             return rollD20();
         }
-        else{
-        return 0;
+        switch (numChoice) {
+        case 1: return rollD20() + calculateModifier(head->strength);
+        case 2: return rollD20() + calculateModifier(head->dexterity);
+        case 3: return rollD20() + calculateModifier(head->constitution);
+        case 4: return rollD20() + calculateModifier(head->intelligence);
+        case 5: return rollD20() + calculateModifier(head->wisdom);
+        case 6: return rollD20() + calculateModifier(head->charisma);
+       
+        default: return rollD20(); // defaults to Unknown for invalid choice
         }
     }
-    return 0;
-    }
-
+    return 0; //indicates failed use of the function
+}
 
 //Searches for a character by name
 void searchCharacter(struct Character *head, char *searchCharacterName){
@@ -444,6 +473,7 @@ int usersClass;
 int usersBackground;
 int usersRace;
 int usersAlignment;
+int usersArmor;
 
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
@@ -535,8 +565,25 @@ int usersAlignment;
             printf("Enter your characters movement speed: ");
             scanf("%d", &head->speed); 
 
-            printf("Enter your characters armor: \n (Some examples include 'unarmored', 'plate_armor', 'hide_armor', 'half_plate_armor')");
-            scanf("%s", head->armor); 
+            printf("Enter your characters armor: \n");
+            printf("1. Unarmored\n");
+            printf("___Light Armor___\n");
+            printf("2. Padded Armor\n");
+            printf("3. Leather Armor\n");
+            printf("4. Studded Leather Armor\n");
+            printf("___Medium Armor___\n");
+            printf("5. Hide Armor\n");
+            printf("6. Chain Shirt Armor\n");
+            printf("7. Scale Mail Armor\n");
+            printf("8. Breastplate Armor\n");
+            printf("9. Half Plate Armor\n");
+            printf("___Heavy Armor___\n");
+            printf("10. Ring Mail Armor\n");
+            printf("11. Chain Mail Armor\n");
+            printf("12. Splint Armor\n");
+            printf("13. Plate Armor\n");
+            scanf("%d", &usersArmor); 
+            strcpy(head->armor, pickArmor(usersArmor));
 
             printf("Does your character have a shield? (1 for yes 0 for no):");
             scanf("%d", &head->hasShield); 
@@ -670,6 +717,31 @@ char *pickAlignment(int userChoice){
         case 7: return "Lawful Evil";
         case 8: return "Neutral Evil";
         case 9: return "Chaotic Evil";
+       
+        default: return "Unknown"; // defaults to Unknown for invalid choice
+    }
+}
+
+char *pickArmor(int userChoice){
+// if user did not enter in a valid response
+    if(userChoice < 1 || userChoice > 13){
+        return "Unknown";
+    }
+// depending on how user responds it will return a string of whatever class is picked
+    switch (userChoice) {
+        case 1: return "Unarmored";
+        case 2: return "Padded Armor";
+        case 3: return "Leather Armor";
+        case 4: return "Studded Leather Armor";
+        case 5: return "Hide Armor";
+        case 6: return "Chain Shirt Armor";
+        case 7: return "Scale Mail Armor";
+        case 8: return "Breastplate Armor";
+        case 9: return "Half Plate Armor";
+        case 10: return "Ring Mail Armor";
+        case 11: return "Chain Mail Armor";
+        case 12: return "Splint Armor";
+        case 13: return "Plate Armor";
        
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
