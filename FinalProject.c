@@ -29,8 +29,8 @@ struct Character {
 
 //calculate functions
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
-int calculateArmorClass(int dexterity, const char *armor, int hasShield);
-
+int calculateArmorClass(int dexterity, const char *armor, int hasShield); //returns armor class via certain character criteria
+int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice); //uses your characters modifiers and +/- from dice roll
 
 //display functions
 void addCharacter(struct Character **head); //adds new character to character list
@@ -38,9 +38,13 @@ void displayCharacter(struct Character *head); //displays your characters
 void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
 void updateCharacter(struct Character *head, char *updateCharacterName); //updates an existing character with new data
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
-int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice);
+
+//dice rolling function
 int rollD20(); //rolls a D20
-char *pickClass(int userChoice);
+
+//character creater functions
+char *pickClass(int userChoice); //via user input returns your characters class
+char *pickBackground(int userChoice); //via user input returns your characters background
 
 int main(){
 
@@ -135,7 +139,8 @@ return 0;
 void addCharacter(struct Character **head){
     //make space for new character in memory
     struct Character *newCharacter = (struct Character *)malloc(sizeof(struct Character));
-    int usersChoice;
+    int usersClass;
+    int usersBackground;
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
         exit(1);
@@ -162,11 +167,28 @@ void addCharacter(struct Character **head){
     printf("10. Sorcerer\n");
     printf("11 Warlock\n");
     printf("12. Wizard\n");
-    scanf("%d", &usersChoice); 
-    strcpy(newCharacter->class, pickClass(usersChoice));
+    scanf("%d", &usersClass); 
+    strcpy(newCharacter->class, pickClass(usersClass));
     
-    printf("Enter your characters background: ");
-    scanf("%s", newCharacter->background); 
+    printf("Enter your characters background:\n");
+    printf("1. Acolyte\n");
+    printf("2. Artisan\n");
+    printf("3. Charlatan\n");
+    printf("4. Criminal\n");
+    printf("5. Entertainer\n");
+    printf("6. Farmer\n");
+    printf("7. Guard\n");
+    printf("8. Guide\n");
+    printf("9. Hermit\n");
+    printf("10. Merchant\n");
+    printf("11 Noble\n");
+    printf("12. Sage\n");
+    printf("13. Sailor\n");
+    printf("14. Scribe\n");
+    printf("15. Soldier\n");
+    printf("16. Wayfarer\n");
+    scanf("%d", &usersBackground); 
+    strcpy(newCharacter->background, pickBackground(usersBackground));
 
     printf("Enter your characters race: ");
     scanf("%s", newCharacter->race); 
@@ -392,7 +414,8 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
 
 //Updates details of your character
 void updateCharacter(struct Character *head, char *updateCharacterName){
-int usersChoice;
+int usersClass;
+int usersBackground;
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
             printf("Enter updated details for your character: %s:\n", updateCharacterName);
@@ -412,11 +435,28 @@ int usersChoice;
             printf("10. Sorcerer\n");
             printf("11 Warlock\n");
             printf("12. Wizard\n");
-            scanf("%d", &usersChoice); 
-            strcpy(head->class, pickClass(usersChoice));
+            scanf("%d", &usersClass); 
+            strcpy(head->class, pickClass(usersClass));
 
-            printf("Enter your characters background: ");
-            scanf("%s", head->background); 
+            printf("Enter your characters background:\n");
+            printf("1. Acolyte\n");
+            printf("2. Artisan\n");
+            printf("3. Charlatan\n");
+            printf("4. Criminal\n");
+            printf("5. Entertainer\n");
+            printf("6. Farmer\n");
+            printf("7. Guard\n");
+            printf("8. Guide\n");
+            printf("9. Hermit\n");
+            printf("10. Merchant\n");
+            printf("11 Noble\n");
+            printf("12. Sage\n");
+            printf("13. Sailor\n");
+            printf("14. Scribe\n");
+            printf("15. Soldier\n");
+            printf("4. Wayfarer\n");
+            scanf("%d", &usersBackground); 
+            strcpy(head->background, pickBackground(usersBackground));
 
             printf("Enter your characters race: ");
             scanf("%s", head->race); 
@@ -469,7 +509,6 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
         prev = temp;
         temp = temp->next;
     }
-
     if(temp == NULL){
         printf("Your character could not be found :(\n\n");
         return;
@@ -483,7 +522,7 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
     }
 
     free(temp);
-    printf("Your character has been deleted...\n\n");
+    printf("\nYour character has been deleted...\n\n");
 }
 
 //generates a random number between 1 & 20
@@ -497,44 +536,48 @@ char *pickClass(int userChoice){
         return "Unknown";
     }
 // depending on how user responds it will return a string of whatever class is picked
-    if(userChoice == 1){
-        return "Barbarian";
-    }
-    else if(userChoice == 2){
-        return "Bard";
-    }
-    else if(userChoice == 3){
-        return "Cleric";
-    }
-     else if(userChoice == 4){
-        return "Druid";
-    }
-     else if(userChoice == 5){
-        return "Fighter";
-    }
-     else if(userChoice == 6){
-        return "Monk";
-    }
-     else if(userChoice == 7){
-        return "Paladin";
-    }
-     else if(userChoice == 8){
-        return "Ranger";
-    }
-     else if(userChoice == 9){
-        return "Rogue";
-    }
-     else if(userChoice == 10){
-        return "Sorcerer";
-    }
-     else if(userChoice == 11){
-        return "Warlock";
-    }
-     else if(userChoice == 12){
-        return "Wizard";
-    }
-    else{
-        return "Unknown";
+    switch (userChoice) {
+        case 1: return "Barbarian";
+        case 2: return "Bard";
+        case 3: return "Cleric";
+        case 4: return "Druid";
+        case 5: return "Fighter";
+        case 6: return "Monk";
+        case 7: return "Paladin";
+        case 8: return "Ranger";
+        case 9: return "Rogue";
+        case 10: return "Sorcerer";
+        case 11: return "Warlock";
+        case 12: return "Wizard";
+       
+        default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
 
+char *pickBackground(int userChoice){
+// if user did not enter in a valid response
+    if(userChoice < 1 || userChoice > 16){
+        return "Unknown";
+    }
+// depending on how user responds it will return a string of whatever class is picked
+    switch (userChoice) {
+        case 1: return "Acolyte";
+        case 2: return "Artisan";
+        case 3: return "Charlatan";
+        case 4: return "Criminal";
+        case 5: return "Entertainer";
+        case 6: return "Farmer";
+        case 7: return "Guard";
+        case 8: return "Guide";
+        case 9: return "Hermit";
+        case 10: return "Merchant";
+        case 11: return "Noble";
+        case 12: return "Sage";
+        case 13: return "Sailor";
+        case 14: return "Scribe";
+        case 15: return "Soldier";
+        case 16: return "Wayfarer";
+       
+        default: return "Unknown"; // defaults to Unknown for invalid choice
+    }
+}
