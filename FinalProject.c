@@ -40,6 +40,7 @@ void updateCharacter(struct Character *head, char *updateCharacterName); //updat
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
 int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice);
 int rollD20(); //rolls a D20
+char *pickClass(int userChoice);
 
 int main(){
 
@@ -134,7 +135,7 @@ return 0;
 void addCharacter(struct Character **head){
     //make space for new character in memory
     struct Character *newCharacter = (struct Character *)malloc(sizeof(struct Character));
-
+    int usersChoice;
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
         exit(1);
@@ -145,12 +146,25 @@ void addCharacter(struct Character **head){
     printf("Enter your characters name: ");
     scanf("%s", newCharacter->name); 
 
-    printf("Enter your characters level: ");
+    printf("Enter your characters level (min: 1 max: 20): ");
     scanf("%d", &newCharacter->level); 
 
-    printf("Enter your characters class: ");
-    scanf("%s", newCharacter->class); 
-
+    printf("Enter which class your character is:\n");
+    printf("1. Barbarian\n");
+    printf("2. Bard\n");
+    printf("3. Cleric\n");
+    printf("4. Druid\n");
+    printf("5. Fighter\n");
+    printf("6. Monk\n");
+    printf("7. Paladin\n");
+    printf("8. Ranger\n");
+    printf("9. Rogue\n");
+    printf("10. Sorcerer\n");
+    printf("11 Warlock\n");
+    printf("12. Wizard\n");
+    scanf("%d", &usersChoice); 
+    strcpy(newCharacter->class, pickClass(usersChoice));
+    
     printf("Enter your characters background: ");
     scanf("%s", newCharacter->background); 
 
@@ -378,15 +392,28 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
 
 //Updates details of your character
 void updateCharacter(struct Character *head, char *updateCharacterName){
-
+int usersChoice;
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
             printf("Enter updated details for your character: %s:\n", updateCharacterName);
             printf("Enter your characters level: ");
             scanf("%d", &head->level); 
 
-            printf("Enter your characters class: ");
-            scanf("%s", head->class); 
+            printf("Enter which class your character is:\n");
+            printf("1. Barbarian\n");
+            printf("2. Bard\n");
+            printf("3. Cleric\n");
+            printf("4. Druid\n");
+            printf("5. Fighter\n");
+            printf("6. Monk\n");
+            printf("7. Paladin\n");
+            printf("8. Ranger\n");
+            printf("9. Rogue\n");
+            printf("10. Sorcerer\n");
+            printf("11 Warlock\n");
+            printf("12. Wizard\n");
+            scanf("%d", &usersChoice); 
+            strcpy(head->class, pickClass(usersChoice));
 
             printf("Enter your characters background: ");
             scanf("%s", head->background); 
@@ -459,7 +486,55 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
     printf("Your character has been deleted...\n\n");
 }
 
-
+//generates a random number between 1 & 20
 int rollD20(){
     return rand() % 20 + 1;
 }
+
+char *pickClass(int userChoice){
+// if user did not enter in a valid response
+    if(userChoice < 1 || userChoice > 12){
+        return "Unknown";
+    }
+// depending on how user responds it will return a string of whatever class is picked
+    if(userChoice == 1){
+        return "Barbarian";
+    }
+    else if(userChoice == 2){
+        return "Bard";
+    }
+    else if(userChoice == 3){
+        return "Cleric";
+    }
+     else if(userChoice == 4){
+        return "Druid";
+    }
+     else if(userChoice == 5){
+        return "Fighter";
+    }
+     else if(userChoice == 6){
+        return "Monk";
+    }
+     else if(userChoice == 7){
+        return "Paladin";
+    }
+     else if(userChoice == 8){
+        return "Ranger";
+    }
+     else if(userChoice == 9){
+        return "Rogue";
+    }
+     else if(userChoice == 10){
+        return "Sorcerer";
+    }
+     else if(userChoice == 11){
+        return "Warlock";
+    }
+     else if(userChoice == 12){
+        return "Wizard";
+    }
+    else{
+        return "Unknown";
+    }
+}
+
