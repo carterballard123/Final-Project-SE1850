@@ -46,6 +46,7 @@ int rollD20(); //rolls a D20
 char *pickClass(int userChoice); //via user input returns your characters class
 char *pickBackground(int userChoice); //via user input returns your characters background
 char *pickRace(int userChoice); //via user input returns your characters race
+char *pickAlignment(int userChoice); //via user input returns your characters alignment
 
 int main(){
 
@@ -143,6 +144,7 @@ void addCharacter(struct Character **head){
     int usersClass;
     int usersBackground;
     int usersRace;
+    int usersAlignment;
 
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
@@ -207,8 +209,18 @@ void addCharacter(struct Character **head){
     scanf("%d", &usersRace); 
     strcpy(newCharacter->race, pickRace(usersRace));
 
-    printf("Enter your characters alignment: ");
-    scanf("%s", newCharacter->alignment); 
+    printf("Enter your characters alignment:\n");
+    printf("1. Lawful Good\n");
+    printf("2. Neutral Good\n");
+    printf("3. Chaotic Good\n");
+    printf("4. Lawful Neutral\n");
+    printf("5. True Neutral\n");
+    printf("6. Chaotic Neutral\n");
+    printf("7. Lawful Evil\n");
+    printf("8. Neutral Evil\n");
+    printf("9. Chaotic Evil\n");
+    scanf("%d", &usersAlignment); 
+    strcpy(newCharacter->alignment, pickAlignment(usersAlignment));
 
     printf("Enter your characters strength value (8-20): ");
     scanf("%d", &newCharacter->strength); 
@@ -431,6 +443,7 @@ void updateCharacter(struct Character *head, char *updateCharacterName){
 int usersClass;
 int usersBackground;
 int usersRace;
+int usersAlignment;
 
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
@@ -488,8 +501,18 @@ int usersRace;
             scanf("%d", &usersRace); 
             strcpy(head->race, pickRace(usersRace));
 
-            printf("Enter your characters alignment: ");
-            scanf("%s", head->alignment); 
+            printf("Enter your characters alignment:\n");
+            printf("1. Lawful Good\n");
+            printf("2. Neutral Good\n");
+            printf("3. Chaotic Good\n");
+            printf("4. Lawful Neutral\n");
+            printf("5. True Neutral\n");
+            printf("6. Chaotic Neutral\n");
+            printf("7. Lawful Evil\n");
+            printf("8. Neutral Evil\n");
+            printf("9. Chaotic Evil\n");
+            scanf("%d", &usersAlignment); 
+            strcpy(head->alignment, pickAlignment(usersAlignment));
 
             printf("Enter your characters strength value (8-20): ");
             scanf("%d", &head->strength); 
@@ -611,7 +634,7 @@ char *pickBackground(int userChoice){
 
 char *pickRace(int userChoice){
 // if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 16){
+    if(userChoice < 1 || userChoice > 10){
         return "Unknown";
     }
 // depending on how user responds it will return a string of whatever class is picked
@@ -626,6 +649,27 @@ char *pickRace(int userChoice){
         case 8: return "Human";
         case 9: return "Orc";
         case 10: return "Tiefling";
+       
+        default: return "Unknown"; // defaults to Unknown for invalid choice
+    }
+}
+
+char *pickAlignment(int userChoice){
+// if user did not enter in a valid response
+    if(userChoice < 1 || userChoice > 9){
+        return "Unknown";
+    }
+// depending on how user responds it will return a string of whatever class is picked
+    switch (userChoice) {
+        case 1: return "Lawful Good";
+        case 2: return "Neutral Good";
+        case 3: return "Chaotic Good";
+        case 4: return "Lawful Neutral";
+        case 5: return "True Neutral";
+        case 6: return "Chaotic Neutral";
+        case 7: return "Lawful Evil";
+        case 8: return "Neutral Evil";
+        case 9: return "Chaotic Evil";
        
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
