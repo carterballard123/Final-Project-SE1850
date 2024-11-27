@@ -22,10 +22,10 @@ struct Character {
     int speed;  //character speed val
     int armorClass;  //character armor class
     char armor[50];  //character armor - helps determine their armor class
+    char weapon[50];  //character weapon - determines how much damage a character can do
     int hasShield;  //characters has a shield or not - helps determine their armor class
     struct Character *next;  //points to the next character in the list
 };
-
 
 //calculate functions
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
@@ -40,7 +40,12 @@ void updateCharacter(struct Character *head, char *updateCharacterName); //updat
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
 
 //dice rolling function
-int rollD20(); //rolls a D20
+int rollD20(void); //rolls a D20
+int rollD12(void); //rolls a D12
+int rollD10(void); //rolls a D10
+int rollD8(void); //rolls a D8
+int rollD6(void); //rolls a D6
+int rollD4(void); //rolls a D4
 
 //character creater functions
 char *pickClass(int userChoice); //via user input returns your characters class
@@ -49,7 +54,7 @@ char *pickRace(int userChoice); //via user input returns your characters race
 char *pickAlignment(int userChoice); //via user input returns your characters alignment
 char *pickArmor(int userChoice); //via user input returns your characters armor (if any)
 
-int main(int argc, char *argv[]){
+int main(){
 
 srand(time(NULL)); //seeds a random number
 
@@ -172,7 +177,7 @@ void addCharacter(struct Character **head){
     printf("8. Ranger\n");
     printf("9. Rogue\n");
     printf("10. Sorcerer\n");
-    printf("11 Warlock\n");
+    printf("11. Warlock\n");
     printf("12. Wizard\n");
     scanf("%d", &usersClass); 
     strcpy(newCharacter->class, pickClass(usersClass));
@@ -188,7 +193,7 @@ void addCharacter(struct Character **head){
     printf("8. Guide\n");
     printf("9. Hermit\n");
     printf("10. Merchant\n");
-    printf("11 Noble\n");
+    printf("11. Noble\n");
     printf("12. Sage\n");
     printf("13. Sailor\n");
     printf("14. Scribe\n");
@@ -264,6 +269,8 @@ void addCharacter(struct Character **head){
 
     printf("Does your character have a shield? (1 for yes 0 for no):");
     scanf("%d", &newCharacter->hasShield); 
+
+
     newCharacter->speed = 30;
     //inserts the new character at the beginning of the list
     newCharacter->next = *head;
@@ -297,57 +304,12 @@ void displayCharacter(struct Character *head){
     }
 }
 
-
-int calculateModifier(int attribute){
-
 //returns the modifer associated with your character attribute
-
-if(attribute < 2){ 
-    return -5; 
+int calculateModifier(int attribute){
+    return (attribute - 10) / 2;
 }
 
-else if(attribute < 4){
-    return -4;
-}
-
-else if(attribute < 6){
-    return -3;
-}
-
-else if(attribute < 8){
-    return -2;
-}
-
-else if(attribute < 10){
-    return -1;
-}
-
-else if(attribute < 12){
-    return 0;
-}
-
-else if(attribute < 14){
-    return 1;
-}
-
-else if(attribute < 16){
-    return 2;
-}
-
-else if(attribute < 18){
-    return 3;
-}
-
-else if(attribute < 20){
-    return 4;
-}
-
-else{
-    return 5;
-}
-}
-
-
+//returns your characters armor class number
 int calculateArmorClass(int dexterity, const char *armor, int hasShield){
 
 int addArmorClass; //if character has a shiled than they gain a +2 to armor class
@@ -378,7 +340,7 @@ if(strcmp(armor, "Padded Armor") == 0){
 if(strcmp(armor, "Leather Armor") == 0){
     return 11 + calculateModifier(dexterity) + addArmorClass;
 }
-if(strcmp(armor, "Studded Leather") == 0){
+if(strcmp(armor, "Studded Leather Armor") == 0){
     return 12 + calculateModifier(dexterity) + addArmorClass;
 }
 //medium armor
@@ -410,34 +372,32 @@ if(strcmp(armor, "Splint Armor") == 0){
 if(strcmp(armor, "Plate Armor") == 0){
     return 18 + addArmorClass;
 }
-printf("Invlaid armor type\n");
+printf("\nInvlaid armor type\n\n");
 return 10; //deafults to 10
 }
 
 
 int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice){
-
+    //puts all characters modifiers in an array
+    int *attributes[] = {
+        &head->strength, &head->dexterity,
+        &head->constitution, &head->intelligence,
+        &head->wisdom, &head->charisma
+    };  
     //check to see if list is empty
     if(head == NULL){ 
-        return 0;
+        return -1; //indicates error
     }
-    
-    if (strcmp(head->name, diceCharacterName) == 0){
-        if(numChoice > 6 || numChoice < 1){
-            return rollD20();
-        }
-        switch (numChoice) {
-        case 1: return rollD20() + calculateModifier(head->strength);
-        case 2: return rollD20() + calculateModifier(head->dexterity);
-        case 3: return rollD20() + calculateModifier(head->constitution);
-        case 4: return rollD20() + calculateModifier(head->intelligence);
-        case 5: return rollD20() + calculateModifier(head->wisdom);
-        case 6: return rollD20() + calculateModifier(head->charisma);
-       
-        default: return rollD20(); // defaults to Unknown for invalid choice
-        }
+    //checks to make sure the character entered exists
+    if (strcmp(head->name, diceCharacterName) != 0){
+        return -1; //not found -1 indicating error
     }
-    return 0; //indicates failed use of the function
+    //validates numChoice
+    if(numChoice > 6 || numChoice < 1){
+        return rollD20();
+    }
+    //returns the baseRoll + your character modifier of choice
+    return rollD20() + calculateModifier(*attributes[numChoice - 1]);
 }
 
 //Searches for a character by name
@@ -469,11 +429,11 @@ void searchCharacter(struct Character *head, char *searchCharacterName){
 
 //Updates details of your character
 void updateCharacter(struct Character *head, char *updateCharacterName){
-int usersClass;
-int usersBackground;
-int usersRace;
-int usersAlignment;
-int usersArmor;
+    int usersClass;
+    int usersBackground;
+    int usersRace;
+    int usersAlignment;
+    int usersArmor;
 
     while (head != NULL){
         if (strcmp(head->name, updateCharacterName) == 0){
@@ -492,7 +452,7 @@ int usersArmor;
             printf("8. Ranger\n");
             printf("9. Rogue\n");
             printf("10. Sorcerer\n");
-            printf("11 Warlock\n");
+            printf("11. Warlock\n");
             printf("12. Wizard\n");
             scanf("%d", &usersClass); 
             strcpy(head->class, pickClass(usersClass));
@@ -508,7 +468,7 @@ int usersArmor;
             printf("8. Guide\n");
             printf("9. Hermit\n");
             printf("10. Merchant\n");
-            printf("11 Noble\n");
+            printf("11. Noble\n");
             printf("12. Sage\n");
             printf("13. Sailor\n");
             printf("14. Scribe\n");
@@ -585,7 +545,7 @@ int usersArmor;
             scanf("%d", &usersArmor); 
             strcpy(head->armor, pickArmor(usersArmor));
 
-            printf("Does your character have a shield? (1 for yes 0 for no):");
+            printf("Does your character have a shield?\n");
             scanf("%d", &head->hasShield); 
             printf("Character details have updated successfully.\n\n");
             return;
@@ -623,15 +583,31 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
 }
 
 //generates a random number between 1 & 20
-int rollD20(){
+int rollD20(void){
     return rand() % 20 + 1;
+}
+//generates a random number between 1 & 12
+int rollD12(void){
+    return rand() % 12 + 1;
+}
+//generates a random number between 1 & 10
+int rollD10(void){
+    return rand() % 10 + 1;
+}
+//generates a random number between 1 & 8
+int rollD8(void){
+    return rand() % 8 + 1;
+}
+//generates a random number between 1 & 6
+int rollD6(void){
+    return rand() % 6 + 1;
+}
+//generates a random number between 1 & 4
+int rollD4(void){
+    return rand() % 4 + 1;
 }
 
 char *pickClass(int userChoice){
-// if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 12){
-        return "Unknown";
-    }
 // depending on how user responds it will return a string of whatever class is picked
     switch (userChoice) {
         case 1: return "Barbarian";
@@ -646,16 +622,11 @@ char *pickClass(int userChoice){
         case 10: return "Sorcerer";
         case 11: return "Warlock";
         case 12: return "Wizard";
-       
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
 
 char *pickBackground(int userChoice){
-// if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 16){
-        return "Unknown";
-    }
 // depending on how user responds it will return a string of whatever class is picked
     switch (userChoice) {
         case 1: return "Acolyte";
@@ -673,17 +644,12 @@ char *pickBackground(int userChoice){
         case 13: return "Sailor";
         case 14: return "Scribe";
         case 15: return "Soldier";
-        case 16: return "Wayfarer";
-       
+        case 16: return "Wayfarer"; 
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
 
 char *pickRace(int userChoice){
-// if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 10){
-        return "Unknown";
-    }
 // depending on how user responds it will return a string of whatever class is picked
     switch (userChoice) {
         case 1: return "Aasimar";
@@ -696,16 +662,11 @@ char *pickRace(int userChoice){
         case 8: return "Human";
         case 9: return "Orc";
         case 10: return "Tiefling";
-       
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
 
 char *pickAlignment(int userChoice){
-// if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 9){
-        return "Unknown";
-    }
 // depending on how user responds it will return a string of whatever class is picked
     switch (userChoice) {
         case 1: return "Lawful Good";
@@ -717,16 +678,11 @@ char *pickAlignment(int userChoice){
         case 7: return "Lawful Evil";
         case 8: return "Neutral Evil";
         case 9: return "Chaotic Evil";
-       
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
 
 char *pickArmor(int userChoice){
-// if user did not enter in a valid response
-    if(userChoice < 1 || userChoice > 13){
-        return "Unknown";
-    }
 // depending on how user responds it will return a string of whatever class is picked
     switch (userChoice) {
         case 1: return "Unarmored";
@@ -742,7 +698,6 @@ char *pickArmor(int userChoice){
         case 11: return "Chain Mail Armor";
         case 12: return "Splint Armor";
         case 13: return "Plate Armor";
-       
         default: return "Unknown"; // defaults to Unknown for invalid choice
     }
 }
