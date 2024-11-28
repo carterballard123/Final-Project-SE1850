@@ -142,7 +142,100 @@ return 0;
 }
 
 
-//functions:
+//returns the modifer associated with your character attribute
+int calculateModifier(int attribute){
+    return (attribute - 10) / 2;
+}
+
+//returns your characters armor class number
+int calculateArmorClass(int dexterity, const char *armor, int hasShield){
+    int addArmorClass; //if character has a shiled than they gain a +2 to armor class
+    int maxDexterity; //some armor only allows a max of +2 from your dexterity modifier
+
+    if(hasShield == 0){
+        addArmorClass = 0;
+    }
+    else{
+        addArmorClass = 2;
+    }
+
+    if(calculateModifier(dexterity) > 2){
+    maxDexterity = 2;
+    }
+    else{
+        maxDexterity = calculateModifier(dexterity);
+    }
+
+    //Calculates armor class based on what kind of armor, dexterity, and if they have a shield
+    if(strcmp(armor, "Unarmored") == 0){
+        return 10 + calculateModifier(dexterity) + addArmorClass;
+    }
+    //light armor
+    if(strcmp(armor, "Padded Armor") == 0){
+        return 11 + calculateModifier(dexterity) + addArmorClass;
+    }
+    if(strcmp(armor, "Leather Armor") == 0){
+        return 11 + calculateModifier(dexterity) + addArmorClass;
+    }
+    if(strcmp(armor, "Studded Leather Armor") == 0){
+        return 12 + calculateModifier(dexterity) + addArmorClass;
+    }
+    //medium armor
+    if(strcmp(armor, "Hide Armor") == 0){
+        return 12 + maxDexterity + addArmorClass;
+    }
+    if(strcmp(armor, "Chain Shirt Armor") == 0){
+        return 13 + maxDexterity + addArmorClass;
+    }
+    if(strcmp(armor, "Scale Mail Armor") == 0){
+        return 14 + maxDexterity + addArmorClass;
+    }
+    if(strcmp(armor, "Breastplate Armor") == 0){
+        return 14 + maxDexterity + addArmorClass;
+    }
+    if(strcmp(armor, "Half Plate Armor") == 0){
+        return 15 + maxDexterity + addArmorClass;
+    }
+    //heavy armor
+    if(strcmp(armor, "Ring Mail Armor") == 0){
+        return 14 +  addArmorClass;
+    }
+    if(strcmp(armor, "Chain Mail Armor") == 0){
+        return 16 + addArmorClass;
+    }
+    if(strcmp(armor, "Splint Armor") == 0){
+        return 17 + addArmorClass;
+    }
+    if(strcmp(armor, "Plate Armor") == 0){
+        return 18 + addArmorClass;
+    }
+    printf("\nInvlaid armor type\n\n");
+    return 10; //deafults to 10
+}
+
+
+int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice){
+    //puts all characters modifiers in an array
+    int *attributes[] = {
+        &head->strength, &head->dexterity,
+        &head->constitution, &head->intelligence,
+        &head->wisdom, &head->charisma
+    };  
+    //check to see if list is empty
+    if(head == NULL){ 
+        return -1; //indicates error
+    }
+    //checks to make sure the character entered exists
+    if (strcmp(head->name, diceCharacterName) != 0){
+        return -1; //not found -1 indicating error
+    }
+    //validates numChoice
+    if(numChoice > 6 || numChoice < 1){
+        return rollD20();
+    }
+    //returns the baseRoll + your character modifier of choice
+    return rollD20() + calculateModifier(*attributes[numChoice - 1]);
+}
 
 void addCharacter(struct Character **head){
     //make space for new character in memory
@@ -277,7 +370,6 @@ void addCharacter(struct Character **head){
     *head = newCharacter;
 }
 
-
 void displayCharacter(struct Character *head){
 
     //check to see if list is empty
@@ -302,102 +394,6 @@ void displayCharacter(struct Character *head){
         printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", head->charisma, calculateModifier(head->charisma));                          //displays Charisma
         head = head->next;
     }
-}
-
-//returns the modifer associated with your character attribute
-int calculateModifier(int attribute){
-    return (attribute - 10) / 2;
-}
-
-//returns your characters armor class number
-int calculateArmorClass(int dexterity, const char *armor, int hasShield){
-
-int addArmorClass; //if character has a shiled than they gain a +2 to armor class
-int maxDexterity; //some armor only allows a max of +2 from your dexterity modifier
-
-if(hasShield == 0){
-    addArmorClass = 0;
-}
-else{
-    addArmorClass = 2;
-}
-
-if(calculateModifier(dexterity) > 2){
-maxDexterity = 2;
-}
-else{
-    maxDexterity = calculateModifier(dexterity);
-}
-
-//Calculates armor class based on what kind of armor, dexterity, and if they have a shield
-if(strcmp(armor, "Unarmored") == 0){
-    return 10 + calculateModifier(dexterity) + addArmorClass;
-}
-//light armor
-if(strcmp(armor, "Padded Armor") == 0){
-    return 11 + calculateModifier(dexterity) + addArmorClass;
-}
-if(strcmp(armor, "Leather Armor") == 0){
-    return 11 + calculateModifier(dexterity) + addArmorClass;
-}
-if(strcmp(armor, "Studded Leather Armor") == 0){
-    return 12 + calculateModifier(dexterity) + addArmorClass;
-}
-//medium armor
-if(strcmp(armor, "Hide Armor") == 0){
-    return 12 + maxDexterity + addArmorClass;
-}
-if(strcmp(armor, "Chain Shirt Armor") == 0){
-    return 13 + maxDexterity + addArmorClass;
-}
-if(strcmp(armor, "Scale Mail Armor") == 0){
-    return 14 + maxDexterity + addArmorClass;
-}
-if(strcmp(armor, "Breastplate Armor") == 0){
-    return 14 + maxDexterity + addArmorClass;
-}
-if(strcmp(armor, "Half Plate Armor") == 0){
-    return 15 + maxDexterity + addArmorClass;
-}
-//heavy armor
-if(strcmp(armor, "Ring Mail Armor") == 0){
-    return 14 +  addArmorClass;
-}
-if(strcmp(armor, "Chain Mail Armor") == 0){
-    return 16 + addArmorClass;
-}
-if(strcmp(armor, "Splint Armor") == 0){
-    return 17 + addArmorClass;
-}
-if(strcmp(armor, "Plate Armor") == 0){
-    return 18 + addArmorClass;
-}
-printf("\nInvlaid armor type\n\n");
-return 10; //deafults to 10
-}
-
-
-int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice){
-    //puts all characters modifiers in an array
-    int *attributes[] = {
-        &head->strength, &head->dexterity,
-        &head->constitution, &head->intelligence,
-        &head->wisdom, &head->charisma
-    };  
-    //check to see if list is empty
-    if(head == NULL){ 
-        return -1; //indicates error
-    }
-    //checks to make sure the character entered exists
-    if (strcmp(head->name, diceCharacterName) != 0){
-        return -1; //not found -1 indicating error
-    }
-    //validates numChoice
-    if(numChoice > 6 || numChoice < 1){
-        return rollD20();
-    }
-    //returns the baseRoll + your character modifier of choice
-    return rollD20() + calculateModifier(*attributes[numChoice - 1]);
 }
 
 //Searches for a character by name
