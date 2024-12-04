@@ -2,12 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 
 struct Character {
-    char name[50];            //character name
+    char name[25];            //character name
     int level;                //character level
     char class[20];           //character class
     char background[20];      //character background
@@ -28,7 +27,7 @@ struct Character {
 };
 
 struct Armor {
-    char name[50];            // Name of the armor (e.g., "Chain Mail")
+    char name[25];            // Name of the armor (e.g., "Chain Mail")
     char type[20];            // Type of armor (e.g., "Light", "Medium", "Heavy")
     int baseAC;               // Base armor class provided by the armor
     int maxDexBonus;          // Maximum Dexterity modifier that can be added
@@ -39,7 +38,7 @@ struct Armor {
 
 
 struct Weapon {
-    char name[50];            // Name of the weapon (e.g., "Longsword")
+    char name[25];            // Name of the weapon (e.g., "Longsword")
     char type[25];            // Type of weapon (e.g., "Melee", "Ranged")
     char damageType[20];      // Damage type (e.g., "Slashing", "Piercing")
     char damageDice[10];      // Damage dice (e.g., "1d8", "2d6")
@@ -127,6 +126,7 @@ const char *classes[] = {
 };
 
 //selecting functions (adding updating character data)
+void selectName(struct Character *character);
 void selectShield(struct Character *character);
 void selectLevel(struct Character *character);
 void selectClass(struct Character *character);
@@ -163,15 +163,15 @@ srand(time(NULL)); //seeds a random number
 char searchCharacterName[50]; //Array to store name for searching
 char updateCharacterName[50]; //Array to store name for updating
 char deleteCharacterName[50]; //Array to store name for deleting
-char diceCharacterName[50];  //Array to store name for dice rolling
+char diceCharacterName[50];   //Array to store name for dice rolling
 
 int choice; //users choice
 int numChoice; //users choice for dice roll
 struct Character *characterList = NULL;
+printf("\nWelcome to the DnD Character Creator!\n\n");
 
 do{
     //menu options
-    printf("\nWelcome to the DnD Character Creator!\n\n");
     printf("1. Add a new character\n");
     printf("2. Display character\n");
     printf("3. Search for character\n");
@@ -225,7 +225,7 @@ do{
         printf("You rolled: %d\n\n", calculateRollModifier(characterList, diceCharacterName, numChoice));
     }
     if(choice == 7){
-        printf("You rolled: %d", rollD20());
+        printf("You rolled: %d\n\n", rollD20());
     }
     if(choice == 8){
         printf("Exiting DnD Character Creator...\n");
@@ -314,11 +314,6 @@ int calculateRollModifier(struct Character *head, char *diceCharacterName, int n
 void addCharacter(struct Character **newChar){
     //make space for new character in memory
     struct Character *newCharacter = (struct Character *)malloc(sizeof(struct Character));
-    int usersClass;
-    int usersBackground;
-    int usersRace;
-    int usersAlignment;
-    int usersArmor;
 
     if (newCharacter == NULL){
         printf("Failed to allocate memory :(\n");
@@ -326,24 +321,19 @@ void addCharacter(struct Character **newChar){
     }
 
     //prompt user to enter details for character
-    printf("For more information regarding DnD character details visit DnD Beyond\n\n");
+    printf("For more information regarding DnD character details visit DnD Beyond\n");
+
     printf("Enter your characters name: ");
-    scanf("%s", newCharacter->name); 
-
+    scanf("%24s", newCharacter->name);
+    printf("Your characters name is: %s\n", newCharacter->name);
+    // Calls the select functions to gather information about your character
     selectLevel(newCharacter);
-
-    selectClass(newCharacter);
-    
+    selectClass(newCharacter);  
     selectBackground(newCharacter);
-
     selectRace(newCharacter);
-
     selectAlignment(newCharacter);
-    
     selectAttributes(newCharacter);
-
     selectArmor(newCharacter);
-
     selectShield(newCharacter);
 
     newCharacter->speed = 30;
@@ -356,8 +346,8 @@ void displayCharacter(struct Character *character){
 
     //check to see if list is empty
     if(character == NULL){ 
-        printf("No characters in the list.\n");
-        printf("Please enter a character first\n");
+        printf("\nNo characters in the list...\n");
+        printf("Please enter a character first\n\n");
         return;
     }
 
@@ -379,58 +369,48 @@ void displayCharacter(struct Character *character){
 }
 
 //Searches for a character by name
-void searchCharacter(struct Character *head, char *searchCharacterName){
+void searchCharacter(struct Character *character, char *searchCharacterName){
     int ifFound = 0;
 
-    while(head != NULL){
-        if (strcmp(head->name, searchCharacterName) == 0){
-            printf("Your character has been found:\n\n");
-            printf("Class: %s   Level: %d   Background: %s\n\n", head->class, head->level, head->background);                                    //displays Class, Level, Background
-            printf("Race: %s    Alignment: %s\n\n", head->race, head->alignment);                                                                //displays Race, Alignment
-            printf("Armor Class: %d     Speed: %dft\n\n", calculateArmorClass(head->dexterity, head->armor->name, head->hasShield), head->speed);   //displays Armor Class, Speed
-            printf("Strength\nAbility Score: %d\nModifier: %d\n\n", head->strength, calculateModifier(head->strength));                          //displays Strength
-            printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", head->dexterity, calculateModifier(head->dexterity));                       //displays Dexterity 
-            printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", head->constitution, calculateModifier(head->constitution));              //displays Constitution
-            printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", head->intelligence, calculateModifier(head->intelligence));              //displays Intelligence
-            printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", head->wisdom, calculateModifier(head->wisdom));                                //displays Wisdom
-            printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", head->charisma, calculateModifier(head->charisma));                          //displays Charisma
+    while(character != NULL){
+        if (strcmp(character->name, searchCharacterName) == 0){
+            printf("\n    ___________ Name: %s ___________\n\n", character->name);
+            printf("Class: %s   Level: %d   Background: %s\n\n", character->class, character->level, character->background);                                    //displays Class, Level, Background
+            printf("Race: %s    Alignment: %s\n\n", character->race, character->alignment);                                                                //displays Race, Alignment
+            printf("Armor: %s   Armor Class: %d     Speed: %dft\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->speed);   //displays Armor Class, Speed
+            printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
+            printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
+            printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
+            printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", character->intelligence, calculateModifier(character->intelligence));              //displays Intelligence
+            printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", character->wisdom, calculateModifier(character->wisdom));                                //displays Wisdom
+            printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", character->charisma, calculateModifier(character->charisma));
             ifFound = 1;
             break;
         }
-        head = head->next;
+        character = character->next;
     }
 
     if(ifFound != 1){
-        printf("Your character could not found :(\n\n");
+        printf("\nYour character could not found :(\n\n");
     }
 }
 
 //Updates details of your character
 void updateCharacter(struct Character *updatedCharacter, char *updateCharacterName){
-    int usersClass;
-    int usersBackground;
-    int usersRace;
-    int usersAlignment;
-    int usersArmor;
 
     while (updatedCharacter != NULL){
         if (strcmp(updatedCharacter->name, updateCharacterName) == 0){
             printf("Enter updated details for your character: %s:\n", updateCharacterName);
+
             selectLevel(updatedCharacter);
-
             selectClass(updatedCharacter);
-
             selectBackground(updatedCharacter);
-
             selectRace(updatedCharacter);
-
             selectAlignment(updatedCharacter);
-
             selectAttributes(updatedCharacter); 
-
             selectArmor(updatedCharacter);
-
             selectShield(updatedCharacter);
+
             printf("Character details have been updated successfully.\n\n");
             return;
         }
@@ -441,10 +421,10 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
 }
 
 //Deletes a character from the list
-void deleteCharacter(struct Character **head, char *deleteCharacterName){
+void deleteCharacter(struct Character **character, char *deleteCharacterName){
     struct Character *prev = NULL;
 
-    struct Character *temp = *head;
+    struct Character *temp = *character;
 
     while(temp != NULL && strcmp(temp->name, deleteCharacterName) != 0){
         prev = temp;
@@ -456,7 +436,7 @@ void deleteCharacter(struct Character **head, char *deleteCharacterName){
     }
 
     if(prev == NULL){
-        *head = temp->next;
+        *character = temp->next;
     } 
     else{
         prev->next = temp->next;
