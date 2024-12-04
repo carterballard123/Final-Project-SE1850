@@ -1,0 +1,27 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/carterballard/Desktop/Final Project SE1850/FinalProject'
+relocations:
+  - { offsetInCU: 0x26, offset: 0x26, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x1000009AC, symSize: 0x3B8 }
+  - { offsetInCU: 0x147, offset: 0x147, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x0, symBinAddr: 0x1000009AC, symSize: 0x3B8 }
+  - { offsetInCU: 0x1D7, offset: 0x1D7, size: 0x8, addend: 0x0, symName: _addCharacter, symObjAddr: 0x3B8, symBinAddr: 0x100000D64, symSize: 0x61C }
+  - { offsetInCU: 0x24F, offset: 0x24F, size: 0x8, addend: 0x0, symName: _displayCharacter, symObjAddr: 0x9D4, symBinAddr: 0x100001380, symSize: 0x2B8 }
+  - { offsetInCU: 0x275, offset: 0x275, size: 0x8, addend: 0x0, symName: _searchCharacter, symObjAddr: 0xC8C, symBinAddr: 0x100001638, symSize: 0x2B0 }
+  - { offsetInCU: 0x2B9, offset: 0x2B9, size: 0x8, addend: 0x0, symName: _updateCharacter, symObjAddr: 0xF3C, symBinAddr: 0x1000018E8, symSize: 0x634 }
+  - { offsetInCU: 0x339, offset: 0x339, size: 0x8, addend: 0x0, symName: _deleteCharacter, symObjAddr: 0x1570, symBinAddr: 0x100001F1C, symSize: 0x108 }
+  - { offsetInCU: 0x38C, offset: 0x38C, size: 0x8, addend: 0x0, symName: _calculateRollModifier, symObjAddr: 0x1678, symBinAddr: 0x100002024, symSize: 0x1CC }
+  - { offsetInCU: 0x3D4, offset: 0x3D4, size: 0x8, addend: 0x0, symName: _rollD20, symObjAddr: 0x185C, symBinAddr: 0x100002208, symSize: 0x38 }
+  - { offsetInCU: 0x3FE, offset: 0x3FE, size: 0x8, addend: 0x0, symName: _pickClass, symObjAddr: 0x1894, symBinAddr: 0x100002240, symSize: 0x150 }
+  - { offsetInCU: 0x428, offset: 0x428, size: 0x8, addend: 0x0, symName: _pickBackground, symObjAddr: 0x1A14, symBinAddr: 0x1000023C0, symSize: 0x190 }
+  - { offsetInCU: 0x452, offset: 0x452, size: 0x8, addend: 0x0, symName: _pickRace, symObjAddr: 0x1BE4, symBinAddr: 0x100002590, symSize: 0x130 }
+  - { offsetInCU: 0x47C, offset: 0x47C, size: 0x8, addend: 0x0, symName: _pickAlignment, symObjAddr: 0x1D3C, symBinAddr: 0x1000026E8, symSize: 0x120 }
+  - { offsetInCU: 0x4A6, offset: 0x4A6, size: 0x8, addend: 0x0, symName: _pickArmor, symObjAddr: 0x1E80, symBinAddr: 0x10000282C, symSize: 0x160 }
+  - { offsetInCU: 0x4D0, offset: 0x4D0, size: 0x8, addend: 0x0, symName: _calculateArmorClass, symObjAddr: 0x2014, symBinAddr: 0x1000029C0, symSize: 0x364 }
+  - { offsetInCU: 0x536, offset: 0x536, size: 0x8, addend: 0x0, symName: _calculateModifier, symObjAddr: 0x2378, symBinAddr: 0x100002D24, symSize: 0x15C }
+  - { offsetInCU: 0x560, offset: 0x560, size: 0x8, addend: 0x0, symName: _rollD12, symObjAddr: 0x24D4, symBinAddr: 0x100002E80, symSize: 0x38 }
+  - { offsetInCU: 0x58A, offset: 0x58A, size: 0x8, addend: 0x0, symName: _rollD10, symObjAddr: 0x250C, symBinAddr: 0x100002EB8, symSize: 0x38 }
+  - { offsetInCU: 0x5B4, offset: 0x5B4, size: 0x8, addend: 0x0, symName: _rollD8, symObjAddr: 0x2544, symBinAddr: 0x100002EF0, symSize: 0x38 }
+  - { offsetInCU: 0x5DE, offset: 0x5DE, size: 0x8, addend: 0x0, symName: _rollD6, symObjAddr: 0x257C, symBinAddr: 0x100002F28, symSize: 0x38 }
+  - { offsetInCU: 0x608, offset: 0x608, size: 0x8, addend: 0x0, symName: _rollD4, symObjAddr: 0x25B4, symBinAddr: 0x100002F60, symSize: 0x38 }
+  - { offsetInCU: 0x632, offset: 0x632, size: 0x8, addend: 0x0, symName: _hasShield, symObjAddr: 0x25EC, symBinAddr: 0x100002F98, symSize: 0x70 }
+...
