@@ -114,9 +114,26 @@ const char *alignments[] = {
 "Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"
 };
 
+const char *races[] = {
+"Aasimar", "Dragonborn", "Dwarf", "Elf", "Gnome", "Goliath", "Halfling", "Human", "Orc", "Tiefling"
+};
+
+const char *backgrounds[] = {
+"Acolyte", "Artisan", "Charlatan", "Criminal", "Entertainer", "Farmer", "Guard", "Guide", "Hermit", "Merchant", "Noble", "Sage", "Sailor", "Scribe", "Soldier", "Wayfarer"
+};
+
+const char *classes[] = {
+"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"
+};
+
+//selecting functions (adding updating character data)
+void selectClass(struct Character *character);
+void selectBackground(struct Character *character);
+void selectRace(struct Character *character);
 void selectAlignment(struct Character *character);
 void selectAttributes(struct Character *character);
 void selectArmor(struct Character *newCharacter);
+
 //calculate functions
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
 int calculateArmorClass(int dexterity, const char *armorName, int hasShield); //returns armor class via certain character criteria
@@ -136,13 +153,6 @@ int rollD10(void); //rolls a D10
 int rollD8(void); //rolls a D8
 int rollD6(void); //rolls a D6
 int rollD4(void); //rolls a D4
-
-//character creater functions
-char *pickClass(int userChoice); //via user input returns your characters class
-char *pickBackground(int userChoice); //via user input returns your characters background
-char *pickRace(int userChoice); //via user input returns your characters race
-char *pickAlignment(int userChoice); //via user input returns your characters alignment
-char *pickArmor(int userChoice); //via user input returns your characters armor (if any)
 
 int main(){
 
@@ -240,7 +250,7 @@ int calculateModifier(int attribute){
 //returns your characters armor class number
 int calculateArmorClass(int dexterity, const char *armorName, int hasShield) {
     int shieldBonus = hasShield ? 2 : 0;            // +2 AC if the character has a shield
-    int maxDex = 0;                                 // Default max dex modifier is unlimited
+    int maxDex = 0;                                 // Default max dex modifier
 
     // Find the armor in the armors array
     struct Armor *selectedArmor = NULL;
@@ -250,7 +260,7 @@ int calculateArmorClass(int dexterity, const char *armorName, int hasShield) {
             break;
         }
     }
-    // If armor not found, return a default value
+    // If armor is not found, return a default value
     if (!selectedArmor) {
         printf("Invalid armor type: %s\n", armorName);
         return 10; // Default unarmored AC
@@ -318,55 +328,11 @@ void addCharacter(struct Character **newChar){
     printf("Enter your characters level (min: 1 max: 20): ");
     scanf("%d", &newCharacter->level); 
 
-    printf("Enter which class your character is:\n");
-    printf("1. Barbarian\n");
-    printf("2. Bard\n");
-    printf("3. Cleric\n");
-    printf("4. Druid\n");
-    printf("5. Fighter\n");
-    printf("6. Monk\n");
-    printf("7. Paladin\n");
-    printf("8. Ranger\n");
-    printf("9. Rogue\n");
-    printf("10. Sorcerer\n");
-    printf("11. Warlock\n");
-    printf("12. Wizard\n");
-    scanf("%d", &usersClass); 
-    strcpy(newCharacter->class, pickClass(usersClass));
+    selectClass(newCharacter);
     
-    printf("Enter your characters background:\n");
-    printf("1. Acolyte\n");
-    printf("2. Artisan\n");
-    printf("3. Charlatan\n");
-    printf("4. Criminal\n");
-    printf("5. Entertainer\n");
-    printf("6. Farmer\n");
-    printf("7. Guard\n");
-    printf("8. Guide\n");
-    printf("9. Hermit\n");
-    printf("10. Merchant\n");
-    printf("11. Noble\n");
-    printf("12. Sage\n");
-    printf("13. Sailor\n");
-    printf("14. Scribe\n");
-    printf("15. Soldier\n");
-    printf("16. Wayfarer\n");
-    scanf("%d", &usersBackground); 
-    strcpy(newCharacter->background, pickBackground(usersBackground));
+    selectBackground(newCharacter);
 
-    printf("Enter your characters race:\n");
-    printf("1. Aasimar\n");
-    printf("2. Dragonborn\n");
-    printf("3. Dwarf\n");
-    printf("4. Elf\n");
-    printf("5. Gnome\n");
-    printf("6. Goliath\n");
-    printf("7. Halfling\n");
-    printf("8. Human\n");
-    printf("9. Orc\n");
-    printf("10. Tiefling\n");
-    scanf("%d", &usersRace); 
-    strcpy(newCharacter->race, pickRace(usersRace));
+    selectRace(newCharacter);
 
     selectAlignment(newCharacter);
     
@@ -450,55 +416,11 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
             printf("Enter your characters level: ");
             scanf("%d", &updatedCharacter->level); 
 
-            printf("Enter which class your character is:\n");
-            printf("1. Barbarian\n");
-            printf("2. Bard\n");
-            printf("3. Cleric\n");
-            printf("4. Druid\n");
-            printf("5. Fighter\n");
-            printf("6. Monk\n");
-            printf("7. Paladin\n");
-            printf("8. Ranger\n");
-            printf("9. Rogue\n");
-            printf("10. Sorcerer\n");
-            printf("11. Warlock\n");
-            printf("12. Wizard\n");
-            scanf("%d", &usersClass); 
-            strcpy(updatedCharacter->class, pickClass(usersClass));
+            selectClass(updatedCharacter);
 
-            printf("Enter your characters background:\n");
-            printf("1. Acolyte\n");
-            printf("2. Artisan\n");
-            printf("3. Charlatan\n");
-            printf("4. Criminal\n");
-            printf("5. Entertainer\n");
-            printf("6. Farmer\n");
-            printf("7. Guard\n");
-            printf("8. Guide\n");
-            printf("9. Hermit\n");
-            printf("10. Merchant\n");
-            printf("11. Noble\n");
-            printf("12. Sage\n");
-            printf("13. Sailor\n");
-            printf("14. Scribe\n");
-            printf("15. Soldier\n");
-            printf("16. Wayfarer\n");
-            scanf("%d", &usersBackground); 
-            strcpy(updatedCharacter->background, pickBackground(usersBackground));
+            selectBackground(updatedCharacter);
 
-            printf("Enter your characters race:\n");
-            printf("1. Aasimar\n");
-            printf("2. Dragonborn\n");
-            printf("3. Dwarf\n");
-            printf("4. Elf\n");
-            printf("5. Gnome\n");
-            printf("6. Goliath\n");
-            printf("7. Halfling\n");
-            printf("8. Human\n");
-            printf("9. Orc\n");
-            printf("10. Tiefling\n");
-            scanf("%d", &usersRace); 
-            strcpy(updatedCharacter->race, pickRace(usersRace));
+            selectRace(updatedCharacter);
 
             selectAlignment(updatedCharacter);
 
@@ -568,114 +490,44 @@ int rollD4(void){
     return rand() % 4 + 1;
 }
 
-char *pickClass(int userChoice){
-// depending on how user responds it will return a string of whatever class is picked
-    switch (userChoice) {
-        case 1: return "Barbarian";
-        case 2: return "Bard";
-        case 3: return "Cleric";
-        case 4: return "Druid";
-        case 5: return "Fighter";
-        case 6: return "Monk";
-        case 7: return "Paladin";
-        case 8: return "Ranger";
-        case 9: return "Rogue";
-        case 10: return "Sorcerer";
-        case 11: return "Warlock";
-        case 12: return "Wizard";
-        default: return "Unknown"; // defaults to Unknown for invalid choice
-    }
-}
-
-char *pickBackground(int userChoice){
-// depending on how user responds it will return a string of whatever background is picked
-    switch (userChoice) {
-        case 1: return "Acolyte";
-        case 2: return "Artisan";
-        case 3: return "Charlatan";
-        case 4: return "Criminal";
-        case 5: return "Entertainer";
-        case 6: return "Farmer";
-        case 7: return "Guard";
-        case 8: return "Guide";
-        case 9: return "Hermit";
-        case 10: return "Merchant";
-        case 11: return "Noble";
-        case 12: return "Sage";
-        case 13: return "Sailor";
-        case 14: return "Scribe";
-        case 15: return "Soldier";
-        case 16: return "Wayfarer"; 
-        default: return "Unknown"; // defaults to Unknown for invalid choice
-    }
-}
-
-char *pickRace(int userChoice){
-// depending on how user responds it will return a string of whatever race is picked
-    switch (userChoice) {
-        case 1: return "Aasimar";
-        case 2: return "Dragonborn";
-        case 3: return "Dwarf";
-        case 4: return "Elf";
-        case 5: return "Gnome";
-        case 6: return "Goliath";
-        case 7: return "Halfling";
-        case 8: return "Human";
-        case 9: return "Orc";
-        case 10: return "Tiefling";
-        default: return "Unknown"; // defaults to Unknown for invalid choice
-    }
-}
-
-char *pickAlignment(int userChoice){
-// depending on how user responds it will return a string of whatever alignment is picked
-    switch (userChoice) {
-        case 1: return "Lawful Good";
-        case 2: return "Neutral Good";
-        case 3: return "Chaotic Good";
-        case 4: return "Lawful Neutral";
-        case 5: return "True Neutral";
-        case 6: return "Chaotic Neutral";
-        case 7: return "Lawful Evil";
-        case 8: return "Neutral Evil";
-        case 9: return "Chaotic Evil";
-        default: return "Unknown"; // defaults to Unknown for invalid choice
-    }
-}
-
 void selectArmor(struct Character *character) {
     int usersArmor;
-    //displays menu
-    printf("Enter your character's armor: \n");
-    printf("1. Unarmored\n");
-    printf("___Light Armor___\n");
-    printf("2. Padded Armor\n");
-    printf("3. Leather Armor\n");
-    printf("4. Studded Leather Armor\n");
-    printf("___Medium Armor___\n");
-    printf("5. Hide Armor\n");
-    printf("6. Chain Shirt Armor\n");
-    printf("7. Scale Mail Armor\n");
-    printf("8. Breastplate Armor\n");
-    printf("9. Half Plate Armor\n");
-    printf("___Heavy Armor___\n");
-    printf("10. Ring Mail Armor\n");
-    printf("11. Chain Mail Armor\n");
-    printf("12. Splint Armor\n");
-    printf("13. Plate Armor\n");
-    scanf("%d", &usersArmor);
 
-    // Validate input
-    if (usersArmor < 1 || usersArmor > sizeof(armors) / sizeof(armors[0])) {
-        printf("Invalid armor choice!\n");
-        return;
-    }
+    do {
+        // Display armor menu
+        printf("Enter your character's armor: \n");
+        printf("1. Unarmored\n");
+        printf("___Light Armor___\n");
+        printf("2. Padded Armor\n");
+        printf("3. Leather Armor\n");
+        printf("4. Studded Leather Armor\n");
+        printf("___Medium Armor___\n");
+        printf("5. Hide Armor\n");
+        printf("6. Chain Shirt Armor\n");
+        printf("7. Scale Mail Armor\n");
+        printf("8. Breastplate Armor\n");
+        printf("9. Half Plate Armor\n");
+        printf("___Heavy Armor___\n");
+        printf("10. Ring Mail Armor\n");
+        printf("11. Chain Mail Armor\n");
+        printf("12. Splint Armor\n");
+        printf("13. Plate Armor\n");
+        
+        printf("Enter your choice: \n");
+        scanf("%d", &usersArmor);
+
+        // Validate input
+        if (usersArmor < 1 || usersArmor > 13) {
+            printf("\nInvalid armor choice! Please try again.\n\n");
+        }
+    } while (usersArmor < 1 || usersArmor > 13); // Repeat until valid input
 
     // Assign selected armor
     character->armor = &armors[usersArmor - 1];
 
-    printf("Selected armor: %s\n", character->armor->name);
+    printf("You selected: %s\n", character->armor->name);
 }
+
 
 void selectAttributes(struct Character *character){
     int userChoice;
@@ -746,5 +598,89 @@ void selectAlignment(struct Character *character){
 
     strcpy(character->alignment, alignments[usersAlignment - 1]);
 
-    printf("Selected: %s\n", character->alignment);
+    printf("You selected: %s\n\n", character->alignment);
+}
+
+void selectRace(struct Character *character){
+    int usersRace;
+    int validInput = 0;
+
+    // Display race options
+    printf("Enter your character's race:\n");
+    for(int i = 0; i < 10; i++){
+        printf("%d. %s\n", i + 1, races[i]);
+    }
+
+    // Input validation loop
+    while(!validInput){
+        printf("Enter your Choice: \n");
+        scanf("%d", &usersRace);
+
+        if(usersRace < 1 || usersRace > 10) {
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+
+    strcpy(character->race, races[usersRace - 1]);
+
+    printf("You selected: %s\n\n", character->race);
+}
+
+void selectBackground(struct Character *character){
+    int usersBackground;
+    int validInput = 0;
+
+    // Display background options
+    printf("Enter your character's background:\n");
+    for(int i = 0; i < 16; i++){
+        printf("%d. %s\n", i + 1, backgrounds[i]);
+    }
+
+    // Input validation loop
+    while(!validInput){
+        printf("Enter your Choice: \n");
+        scanf("%d", &usersBackground);
+
+        if(usersBackground < 1 || usersBackground > 16) {
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+
+    strcpy(character->background, backgrounds[usersBackground - 1]);
+
+    printf("You selected: %s\n\n", character->background);
+}
+
+void selectClass(struct Character *character){
+    int usersClass;
+    int validInput = 0;
+
+    // Display Class options
+    printf("Enter your character's class:\n");
+    for(int i = 0; i < 12; i++){
+        printf("%d. %s\n", i + 1, classes[i]);
+    }
+
+    // Input validation loop
+    while(!validInput){
+        printf("Enter your Choice: \n");
+        scanf("%d", &usersClass);
+
+        if(usersClass < 1 || usersClass > 12) {
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+
+    strcpy(character->class, classes[usersClass - 1]);
+
+    printf("You selected: %s\n\n", character->class);
 }
