@@ -493,7 +493,6 @@ void selectArmor(struct Character *character) {
         printf("11. Chain Mail Armor\n");
         printf("12. Splint Armor\n");
         printf("13. Plate Armor\n");
-        
         printf("Enter your choice: ");
         scanf("%d", &usersArmor);
 
@@ -505,10 +504,8 @@ void selectArmor(struct Character *character) {
 
     // Assign selected armor
     character->armor = &armors[usersArmor - 1];
-
     printf("You selected: %s\n", character->armor->name);
 }
-
 
 void selectAttributes(struct Character *character){
     int userChoice;
