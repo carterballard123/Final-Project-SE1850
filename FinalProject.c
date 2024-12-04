@@ -105,11 +105,16 @@ struct Weapon weapons[] = {
     {"War Pick", "Melee", "Piercing", "1d8", "1d8", 0, 0, 0, {0, 0}, 0, 0, 0},
     {"Warhammer", "Melee", "Bludgeoning", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0}
 };
-
+//all attributes
 const char *attributes[] = {
 "Strength", "Dexterity", "Constitution", "Intelligence", "Wisdom", "Charisma"
 };
+//all alignments
+const char *alignments[] = {
+"Lawful Good", "Neutral Good", "Chaotic Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Lawful Evil", "Neutral Evil", "Chaotic Evil"
+};
 
+void selectAlignment(struct Character *character);
 void selectAttributes(struct Character *character);
 void selectArmor(struct Character *newCharacter);
 //calculate functions
@@ -363,27 +368,14 @@ void addCharacter(struct Character **newChar){
     scanf("%d", &usersRace); 
     strcpy(newCharacter->race, pickRace(usersRace));
 
-    printf("Enter your characters alignment:\n");
-    printf("1. Lawful Good\n");
-    printf("2. Neutral Good\n");
-    printf("3. Chaotic Good\n");
-    printf("4. Lawful Neutral\n");
-    printf("5. True Neutral\n");
-    printf("6. Chaotic Neutral\n");
-    printf("7. Lawful Evil\n");
-    printf("8. Neutral Evil\n");
-    printf("9. Chaotic Evil\n");
-    scanf("%d", &usersAlignment); 
-    strcpy(newCharacter->alignment, pickAlignment(usersAlignment));
-
+    selectAlignment(newCharacter);
+    
     selectAttributes(newCharacter);
 
     selectArmor(newCharacter);
 
     printf("Does your character have a shield? (1 for yes 0 for no):");
     scanf("%d", &newCharacter->hasShield); 
-
-
 
     newCharacter->speed = 30;
     //inserts the new character at the beginning of the list
@@ -508,25 +500,14 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
             scanf("%d", &usersRace); 
             strcpy(updatedCharacter->race, pickRace(usersRace));
 
-            printf("Enter your characters alignment:\n");
-            printf("1. Lawful Good\n");
-            printf("2. Neutral Good\n");
-            printf("3. Chaotic Good\n");
-            printf("4. Lawful Neutral\n");
-            printf("5. True Neutral\n");
-            printf("6. Chaotic Neutral\n");
-            printf("7. Lawful Evil\n");
-            printf("8. Neutral Evil\n");
-            printf("9. Chaotic Evil\n");
-            scanf("%d", &usersAlignment); 
-            strcpy(updatedCharacter->alignment, pickAlignment(usersAlignment));
+            selectAlignment(updatedCharacter);
 
             selectAttributes(updatedCharacter); 
 
             selectArmor(updatedCharacter);
 
             printf("Does your character have a shield?\n");
-            scanf("%d", updatedCharacter->hasShield); 
+            scanf("%d", &updatedCharacter->hasShield); 
             printf("Character details have been updated successfully.\n\n");
             return;
         }
@@ -607,7 +588,7 @@ char *pickClass(int userChoice){
 }
 
 char *pickBackground(int userChoice){
-// depending on how user responds it will return a string of whatever class is picked
+// depending on how user responds it will return a string of whatever background is picked
     switch (userChoice) {
         case 1: return "Acolyte";
         case 2: return "Artisan";
@@ -630,7 +611,7 @@ char *pickBackground(int userChoice){
 }
 
 char *pickRace(int userChoice){
-// depending on how user responds it will return a string of whatever class is picked
+// depending on how user responds it will return a string of whatever race is picked
     switch (userChoice) {
         case 1: return "Aasimar";
         case 2: return "Dragonborn";
@@ -647,7 +628,7 @@ char *pickRace(int userChoice){
 }
 
 char *pickAlignment(int userChoice){
-// depending on how user responds it will return a string of whatever class is picked
+// depending on how user responds it will return a string of whatever alignment is picked
     switch (userChoice) {
         case 1: return "Lawful Good";
         case 2: return "Neutral Good";
@@ -682,7 +663,7 @@ void selectArmor(struct Character *character) {
     printf("11. Chain Mail Armor\n");
     printf("12. Splint Armor\n");
     printf("13. Plate Armor\n");
-    scanf("%d", &usersArmor);           //users input
+    scanf("%d", &usersArmor);
 
     // Validate input
     if (usersArmor < 1 || usersArmor > sizeof(armors) / sizeof(armors[0])) {
@@ -691,7 +672,7 @@ void selectArmor(struct Character *character) {
     }
 
     // Assign selected armor
-    character->armor = &armors[usersArmor - 1]; // Array is 0-indexed
+    character->armor = &armors[usersArmor - 1];
 
     printf("Selected armor: %s\n", character->armor->name);
 }
@@ -707,7 +688,7 @@ void selectAttributes(struct Character *character){
             scanf("%d", &userChoice);
 
             if(userChoice < 8 || userChoice > 20){
-                printf("\nInvalid number, please try again...\n");
+                printf("Invalid number, please try again...\n\n");
             } 
             else{
                 switch(i){
@@ -738,4 +719,32 @@ void selectAttributes(struct Character *character){
             }
         }
     }
+}
+
+void selectAlignment(struct Character *character){
+    int usersAlignment;
+    int validInput = 0;
+
+    // Display alignment options
+    printf("Enter your character's alignment:\n");
+    for (int i = 0; i < 9; i++) {
+        printf("%d. %s\n", i + 1, alignments[i]);
+    }
+
+    // Input validation loop
+    while (!validInput) {
+        printf("Enter your Choice: \n");
+        scanf("%d", &usersAlignment);
+
+        if (usersAlignment < 1 || usersAlignment > 9) {
+            printf("Invalid number, please try again...\n\n");
+        } 
+        else {
+            validInput = 1;
+        }
+    }
+
+    strcpy(character->alignment, alignments[usersAlignment - 1]);
+
+    printf("Selected: %s\n", character->alignment);
 }
