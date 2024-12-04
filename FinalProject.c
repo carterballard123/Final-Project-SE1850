@@ -127,6 +127,8 @@ const char *classes[] = {
 };
 
 //selecting functions (adding updating character data)
+void selectShield(struct Character *character);
+void selectLevel(struct Character *character);
 void selectClass(struct Character *character);
 void selectBackground(struct Character *character);
 void selectRace(struct Character *character);
@@ -228,6 +230,9 @@ do{
     if(choice == 8){
         printf("Exiting DnD Character Creator...\n");
     }
+    if(choice > 8 || choice < 1){
+        printf("\nInvalid choice, please try again...\n\n");
+    }
 } while(choice != 8);
 
 
@@ -325,8 +330,7 @@ void addCharacter(struct Character **newChar){
     printf("Enter your characters name: ");
     scanf("%s", newCharacter->name); 
 
-    printf("Enter your characters level (min: 1 max: 20): ");
-    scanf("%d", &newCharacter->level); 
+    selectLevel(newCharacter);
 
     selectClass(newCharacter);
     
@@ -340,8 +344,7 @@ void addCharacter(struct Character **newChar){
 
     selectArmor(newCharacter);
 
-    printf("Does your character have a shield? (1 for yes 0 for no):");
-    scanf("%d", &newCharacter->hasShield); 
+    selectShield(newCharacter);
 
     newCharacter->speed = 30;
     //inserts the new character at the beginning of the list
@@ -413,8 +416,7 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
     while (updatedCharacter != NULL){
         if (strcmp(updatedCharacter->name, updateCharacterName) == 0){
             printf("Enter updated details for your character: %s:\n", updateCharacterName);
-            printf("Enter your characters level: ");
-            scanf("%d", &updatedCharacter->level); 
+            selectLevel(updatedCharacter);
 
             selectClass(updatedCharacter);
 
@@ -428,8 +430,7 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
 
             selectArmor(updatedCharacter);
 
-            printf("Does your character have a shield?\n");
-            scanf("%d", &updatedCharacter->hasShield); 
+            selectShield(updatedCharacter);
             printf("Character details have been updated successfully.\n\n");
             return;
         }
@@ -513,7 +514,7 @@ void selectArmor(struct Character *character) {
         printf("12. Splint Armor\n");
         printf("13. Plate Armor\n");
         
-        printf("Enter your choice: \n");
+        printf("Enter your choice: ");
         scanf("%d", &usersArmor);
 
         // Validate input
@@ -585,7 +586,7 @@ void selectAlignment(struct Character *character){
 
     // Input validation loop
     while (!validInput) {
-        printf("Enter your Choice: \n");
+        printf("Enter your Choice: ");
         scanf("%d", &usersAlignment);
 
         if (usersAlignment < 1 || usersAlignment > 9) {
@@ -613,7 +614,7 @@ void selectRace(struct Character *character){
 
     // Input validation loop
     while(!validInput){
-        printf("Enter your Choice: \n");
+        printf("Enter your Choice: ");
         scanf("%d", &usersRace);
 
         if(usersRace < 1 || usersRace > 10) {
@@ -641,7 +642,7 @@ void selectBackground(struct Character *character){
 
     // Input validation loop
     while(!validInput){
-        printf("Enter your Choice: \n");
+        printf("Enter your Choice: ");
         scanf("%d", &usersBackground);
 
         if(usersBackground < 1 || usersBackground > 16) {
@@ -669,7 +670,7 @@ void selectClass(struct Character *character){
 
     // Input validation loop
     while(!validInput){
-        printf("Enter your Choice: \n");
+        printf("Enter your Choice: ");
         scanf("%d", &usersClass);
 
         if(usersClass < 1 || usersClass > 12) {
@@ -683,4 +684,49 @@ void selectClass(struct Character *character){
     strcpy(character->class, classes[usersClass - 1]);
 
     printf("You selected: %s\n\n", character->class);
+}
+
+void selectLevel(struct Character *character){
+    int usersLevel, validInput = 0; // Initialize validInput to 0
+
+    while(!validInput){
+        printf("Enter your character's level (1-20): ");
+        scanf("%d", &usersLevel);
+
+        if(usersLevel < 1 || usersLevel > 20) {
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+    character->level = usersLevel;
+
+    printf("Your character is level: %d\n\n", character->level);
+}
+
+void selectShield(struct Character *character){
+    int usersShield, validInput = 0; 
+
+    while(!validInput){
+        printf("Enter if your character has a shield (1 for yes, 0 for no): ");
+        scanf("%d", &usersShield);
+
+        // Validate input to ensure it's either 1 or 0
+        if(usersShield != 1 && usersShield != 0){
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+
+    character->hasShield = usersShield;
+
+    if(usersShield == 1){
+        printf("Your character is now holding a shield!\n\n");
+    }
+    else{
+        printf("Your character is not holding a shield!\n\n");
+    }
 }
