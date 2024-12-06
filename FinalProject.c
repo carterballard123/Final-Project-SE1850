@@ -500,30 +500,48 @@ char *armorStealth(struct Armor *armor) {
 }
 
 void selectArmor(struct Character *character) {
-    int usersArmor;
+    int usersArmor, check;
 
-    do {
+    do{
+        check = 0;
         // Display armor menu
         printf("Select Your Armor:\n");
         printf("-------------------------------------------------------------------------------------\n");
-        printf("   %-22s |   %-6s |  %-3s | %-8s | %-12s | %-15s\n", "Name", "Type", "AC", "Dex Mod.", "Stealth", "Requirements");
+        printf("   %-22s |   %-6s |  %-3s | %-8s |    %-10s| %-15s\n", "Name", "Type", "AC", "Dex Mod.", "Stealth", "Requirements");
         printf("-------------------------------------------------------------------------------------\n");
-
+        //prints armor from armors array
         for ( int i = 0; i < 9; i++) {
             printf("%d. %-22s |  %-7s |  %-3d |    %-5d | %-12s | %-15s\n", i + 1, armors[i].name, armors[i].type, armors[i].baseAC, calculateModifier(character->dexterity), armorStealth(&armors[i]), armorRequirement(&armors[i]));
         }
         for (int i = 9; i < 13; i++) {
             printf("%d. %-21s |  %-7s |  %-3d |    %-5d | %-12s | %-15s\n", i + 1, armors[i].name, armors[i].type, armors[i].baseAC, calculateModifier(character->dexterity), armorStealth(&armors[i]), armorRequirement(&armors[i]));
         }
+
         printf("-------------------------------------------------------------------------------------\n");
         printf("\nEnter your choice: ");
         scanf("%d", &usersArmor);
 
-        // Validate input
+        // Validate input + make sure character has enough strength
         if (usersArmor < 1 || usersArmor > 13) {
             printf("\nInvalid armor choice! Please try again.\n\n");
         }
-    } while (usersArmor < 1 || usersArmor > 13); // Repeat until valid input
+        else if(strcmp(armorRequirement(&armors[usersArmor - 1]), "13 Strength") == 0){
+            if(character->strength > 12){
+                check = 1;
+            }
+            printf("\nYou do  not have enough strength to wield this armor! Please try again.\n\n");
+        }
+        else if(strcmp(armorRequirement(&armors[usersArmor - 1]), "15 Strength") == 0){
+            if(character->strength > 14){
+                check = 1;
+            }
+            printf("\nYou do  not have enough strength to wield this armor! Please try again.\n\n");
+        }
+        else{
+            check = 1;
+        }
+
+    } while(usersArmor < 1 || usersArmor > 13 || check == 0);
 
     // Assign selected armor
     character->armor = &armors[usersArmor - 1];
