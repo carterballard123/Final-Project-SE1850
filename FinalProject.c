@@ -128,6 +128,10 @@ const char *classes[] = {
 "Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"
 };
 
+//armor validation functions
+char *armorRequirement(struct Armor *armor);
+char *armorStealth(struct Armor *armor);
+
 //selecting functions (adding updating character data)
 void selectName(struct Character *character);
 void selectShield(struct Character *character);
@@ -138,6 +142,7 @@ void selectRace(struct Character *character);
 void selectAlignment(struct Character *character);
 void selectAttributes(struct Character *character);
 void selectArmor(struct Character *newCharacter);
+void selectWeapon(struct Character *character);
 
 //calculate functions
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
@@ -337,6 +342,7 @@ void addCharacter(struct Character **newChar){
     selectAlignment(newCharacter);
     selectAttributes(newCharacter);
     selectArmor(newCharacter);
+    selectWeapon(newCharacter);
     selectShield(newCharacter);
 
     newCharacter->speed = 30;
@@ -360,7 +366,7 @@ void displayCharacter(struct Character *character){
         printf("    ___________ Name: %s ___________\n\n", character->name);
         printf("Class: %s   Level: %d   Background: %s\n\n", character->class, character->level, character->background);                                    //displays Class, Level, Background
         printf("Race: %s    Alignment: %s\n\n", character->race, character->alignment);                                                                //displays Race, Alignment
-        printf("Armor: %s   Armor Class: %d     Speed: %dft\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->speed);   //displays Armor Class, Speed
+        printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
         printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
         printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
         printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
@@ -380,7 +386,7 @@ void searchCharacter(struct Character *character, char *searchCharacterName){
             printf("\n    ___________ Name: %s ___________\n\n", character->name);
             printf("Class: %s   Level: %d   Background: %s\n\n", character->class, character->level, character->background);                                    //displays Class, Level, Background
             printf("Race: %s    Alignment: %s\n\n", character->race, character->alignment);                                                                //displays Race, Alignment
-            printf("Armor: %s   Armor Class: %d     Speed: %dft\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->speed);   //displays Armor Class, Speed
+            printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
             printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
             printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
             printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
@@ -412,6 +418,7 @@ void updateCharacter(struct Character *updatedCharacter, char *updateCharacterNa
             selectAlignment(updatedCharacter);
             selectAttributes(updatedCharacter); 
             selectArmor(updatedCharacter);
+            selectWeapon(updatedCharacter);
             selectShield(updatedCharacter);
 
             printf("Character details have been updated successfully.\n\n");
@@ -548,11 +555,70 @@ void selectArmor(struct Character *character) {
     printf("You selected: %s\n\n", character->armor->name);
 }
 
-/*
-void selectWeapon(struct Characeter *character){
-
+char *weaponFinesse(struct Weapon *weapon){
+    if(weapon->isFinesse == 1){
+        return "Yes";
+    }
+    else{
+        return "No";
+    }
 }
-*/
+
+char *weaponVersatile(struct Weapon *weapon){
+    if(weapon->isVersatile == 1){
+        return "Yes";
+    }
+    else{
+        return "No";
+    }
+}
+
+char *weaponRange(struct Weapon *weapon) {
+    static char rangeStr[20]; // Use a static buffer for returning the string
+    if (weapon->range[0] == 0 && weapon->range[1] == 0) {
+        return "Melee";
+    } 
+    else {
+        // Format the range into a string
+        snprintf(rangeStr, sizeof(rangeStr), "%d/%d", weapon->range[0], weapon->range[1]);
+        return rangeStr;
+    }
+}
+
+
+void selectWeapon(struct Character *character){
+    int usersWeapon;
+
+    do{
+        // Display armor menu
+        printf("Select Your Weapon(s):\n");
+        printf("-----------------------------------------------------------------------------------------------\n");
+        printf(" %-19s |      %-9s |   %-10s | %-8s | %-5s | %-5s | %-10s \n", "Name", "Type", "DMG type", "DMG dice", "Finesse", "Versitile", "Range");
+        printf("-----------------------------------------------------------------------------------------------\n");
+        //prints weapons from the weapons array
+        for ( int i = 0; i < 9; i++) {
+            printf("%d.  %-16s |  %-13s |  %-11s |    %-5s |   %-5s |    %-6s | %-10s \n", i + 1, weapons[i].name, weapons[i].type, weapons[i].damageType, weapons[i].damageDice, weaponFinesse(&weapons[i]), weaponVersatile(&weapons[i]), weaponRange(&weapons[i]));
+        }
+        for (int i = 9; i < 31; i++) {
+            printf("%d.  %-15s |  %-13s |  %-11s |    %-5s |   %-5s |    %-6s | %-10s \n", i + 1, weapons[i].name, weapons[i].type, weapons[i].damageType, weapons[i].damageDice, weaponFinesse(&weapons[i]), weaponVersatile(&weapons[i]), weaponRange(&weapons[i]));
+        }
+
+        printf("-----------------------------------------------------------------------------------------------\n");
+        printf("\nEnter your choice: ");
+        scanf("%d", &usersWeapon);
+
+        // Validate input + make sure character has enough strength
+        if (usersWeapon < 1 || usersWeapon > 31) {
+            printf("\nInvalid weapon choice! Please try again.\n\n");
+        }
+   
+    } while(usersWeapon < 1 || usersWeapon > 31);
+
+    // Assign selected armor
+    character->weapon = &weapons[usersWeapon - 1];
+    printf("You selected: %s\n\n", character->weapon->name);
+}
+
 
 void selectAttributes(struct Character *character){
     int userChoice;
