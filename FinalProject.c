@@ -32,7 +32,6 @@ struct Armor {
     int baseAC;               // Base armor class provided by the armor
     int maxDexBonus;          // Maximum Dexterity modifier that can be added
     int requiresDexCap;       // 1 if the Dex modifier is capped, 0 otherwise
-    int strengthRequirement;  // Minimum Strength required to wear the armor
     int stealthDisadvantage;  // 1 if the armor imposes disadvantage on Stealth checks
 };
 
@@ -53,56 +52,60 @@ struct Weapon {
 };
 
 struct Armor armors[] = {
-    {"Unarmored", "N/A", 10, -1, 0, 0, 0},
+    {"Unarmored", "-----", 10, -1, 0, 0},
     //light armor
-    {"Padded Armor", "Light", 11, -1, 0, 0, 1},
-    {"Leather Armor", "Light", 11, -1, 0, 0, 0},
-    {"Studded Leather Armor", "Light", 12, -1, 0, 0, 0},
+    {"Padded Armor", "Light", 11, -1, 0, 1},
+    {"Leather Armor", "Light", 11, -1, 0, 0},
+    {"Studded Leather Armor", "Light", 12, -1, 0, 0},
     //medium armor
-    {"Hide Armor", "Medium", 12, 2, 1, 0, 0},
-    {"Chain Shirt Armor", "Medium", 13, 2, 1, 0, 0},
-    {"Scale Mail Armor", "Medium", 14, 2, 1, 0, 1},
-    {"Breastplate Armor", "Medium", 14, 2, 1, 0, 0},
-    {"Half Plate Armor", "Medium", 15, 2, 1, 0, 1},
+    {"Hide Armor", "Medium", 12, 2, 1, 0},
+    {"Chain Shirt Armor", "Medium", 13, 2, 1, 0},
+    {"Scale Mail Armor", "Medium", 14, 2, 1, 1},
+    {"Breastplate Armor", "Medium", 14, 2, 1, 0},
+    {"Half Plate Armor", "Medium", 15, 2, 1, 1},
     //heavy armor
-    {"Ring Mail Armor", "Heavy", 14, 0, 0, 0, 1},
-    {"Chain Mail Armor", "Heavy", 16, 0, 0, 13, 1},
-    {"Splint Armor", "Heavy", 17, 0, 0, 15, 1},
-    {"Plate Armor", "Heavy", 18, 0, 0, 15, 1},
+    {"Ring Mail Armor", "Heavy", 14, 0, 0, 1},
+    {"Chain Mail Armor", "Heavy", 16, 0, 0, 1},
+    {"Splint Armor", "Heavy", 17, 0, 0, 1},
+    {"Plate Armor", "Heavy", 18, 0, 0, 1},
 };
 
 struct Weapon weapons[] = {
+    //bludgeoning
     {"Club", "Melee", "Bludgeoning", "1d4", "1d4", 0, 0, 0, {0, 0}, 0, 1, 0},
-    {"Dagger", "Melee/Ranged", "Piercing", "1d4", "1d4", 1, 0, 0, {20, 60}, 0, 1, 0},
-    {"Greatclub", "Melee", "Bludgeoning", "1d8", "1d8", 0, 0, 1, {0, 0}, 0, 0, 0},
-    {"Handaxe", "Melee/Ranged", "Slashing", "1d6", "1d6", 0, 0, 0, {20, 60}, 0, 1, 0},
-    {"Javelin", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 0, {30, 120}, 0, 0, 0},
     {"Light Hammer", "Melee/Ranged", "Bludgeoning", "1d4", "1d4", 0, 0, 0, {20, 60}, 0, 1, 0},
     {"Mace", "Melee", "Bludgeoning", "1d6", "1d6", 0, 0, 0, {0, 0}, 0, 0, 0},
     {"Quarterstaff", "Melee", "Bludgeoning", "1d6", "1d8", 0, 1, 0, {0, 0}, 0, 0, 0},
-    {"Sickle", "Melee", "Slashing", "1d4", "1d4", 0, 0, 0, {0, 0}, 0, 1, 0},
-    {"Spear", "Melee/Ranged", "Piercing", "1d6", "1d8", 0, 1, 0, {20, 60}, 0, 0, 0},
-    {"Light Crossbow", "Ranged", "Piercing", "1d8", "1d8", 0, 0, 1, {80, 320}, 0, 0, 0},
-    {"Heavy Crossbow", "Ranged", "Piercing", "1d10", "1d10", 0, 0, 1, {100, 400}, 0, 1, 0},
-    {"Hand Crossbow", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 0, {30, 120}, 1, 0, 0},
-    {"Shortbow", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 1, {80, 320}, 0, 0, 0},
-    {"Longbow", "Ranged", "Piercing", "1d8", "1d8", 0, 0, 1, {150, 600}, 0, 1, 0},
-    {"Battleaxe", "Melee", "Slashing", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0},
     {"Flail", "Melee", "Bludgeoning", "1d8", "1d8", 0, 0, 0, {0, 0}, 0, 0, 0},
-    {"Glaive", "Melee", "Slashing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
-    {"Greataxe", "Melee", "Slashing", "1d12", "1d12", 0, 0, 1, {0, 0}, 0, 1, 0},
-    {"Greatsword", "Melee", "Slashing", "2d6", "2d6", 0, 0, 1, {0, 0}, 0, 1, 0},
-    {"Halberd", "Melee", "Slashing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
-    {"Lance", "Melee", "Piercing", "1d12", "1d12", 0, 0, 0, {0, 0}, 0, 0, 1},
-    {"Longsword", "Melee", "Slashing", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0},
+    {"Greatclub", "Melee", "Bludgeoning", "1d8", "1d8", 0, 0, 1, {0, 0}, 0, 0, 0},
+    {"Warhammer", "Melee", "Bludgeoning", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0},
     {"Maul", "Melee", "Bludgeoning", "2d6", "2d6", 0, 0, 1, {0, 0}, 0, 1, 0},
-    {"Pike", "Melee", "Piercing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
+    //piercing
+    {"Dagger", "Melee/Ranged", "Piercing", "1d4", "1d4", 1, 0, 0, {20, 60}, 0, 1, 0},
+    {"Javelin", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 0, {30, 120}, 0, 0, 0},
+    {"Spear", "Melee/Ranged", "Piercing", "1d6", "1d8", 0, 1, 0, {20, 60}, 0, 0, 0},
+    {"Trident", "Melee/Ranged", "Piercing", "1d6", "1d8", 0, 1, 0, {20, 60}, 0, 0, 0},
     {"Rapier", "Melee", "Piercing", "1d8", "1d8", 1, 0, 0, {0, 0}, 0, 0, 0},
+    {"War Pick", "Melee", "Piercing", "1d8", "1d8", 0, 0, 0, {0, 0}, 0, 0, 0},
+    {"Pike", "Melee", "Piercing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
+    {"Lance", "Melee", "Piercing", "1d12", "1d12", 0, 0, 0, {0, 0}, 0, 0, 1},
+    //slashing
+    {"Sickle", "Melee", "Slashing", "1d4", "1d4", 0, 0, 0, {0, 0}, 0, 1, 0},
+    {"Handaxe", "Melee/Ranged", "Slashing", "1d6", "1d6", 0, 0, 0, {20, 60}, 0, 1, 0},
     {"Scimitar", "Melee", "Slashing", "1d6", "1d6", 1, 0, 0, {0, 0}, 1, 0, 0},
     {"Shortsword", "Melee", "Piercing", "1d6", "1d6", 1, 0, 0, {0, 0}, 1, 0, 0},
-    {"Trident", "Melee/Ranged", "Piercing", "1d6", "1d8", 0, 1, 0, {20, 60}, 0, 0, 0},
-    {"War Pick", "Melee", "Piercing", "1d8", "1d8", 0, 0, 0, {0, 0}, 0, 0, 0},
-    {"Warhammer", "Melee", "Bludgeoning", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0}
+    {"Battleaxe", "Melee", "Slashing", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0},
+    {"Longsword", "Melee", "Slashing", "1d8", "1d10", 0, 1, 0, {0, 0}, 0, 0, 0},
+    {"Glaive", "Melee", "Slashing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
+    {"Halberd", "Melee", "Slashing", "1d10", "1d10", 0, 0, 1, {0, 0}, 0, 1, 1},
+    {"Greataxe", "Melee", "Slashing", "1d12", "1d12", 0, 0, 1, {0, 0}, 0, 1, 0},
+    {"Greatsword", "Melee", "Slashing", "2d6", "2d6", 0, 0, 1, {0, 0}, 0, 1, 0},
+    //ranged
+    {"Hand Crossbow", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 0, {30, 120}, 1, 0, 0},
+    {"Shortbow", "Ranged", "Piercing", "1d6", "1d6", 0, 0, 1, {80, 320}, 0, 0, 0},
+    {"Light Crossbow", "Ranged", "Piercing", "1d8", "1d8", 0, 0, 1, {80, 320}, 0, 0, 0},
+    {"Longbow", "Ranged", "Piercing", "1d8", "1d8", 0, 0, 1, {150, 600}, 0, 1, 0},
+    {"Heavy Crossbow", "Ranged", "Piercing", "1d10", "1d10", 0, 0, 1, {100, 400}, 0, 1, 0}
 };
 //all attributes
 const char *attributes[] = {
@@ -471,29 +474,49 @@ int rollD4(void){
     return rand() % 4 + 1;
 }
 
+char *armorRequirement(struct Armor *armor) {
+    // Check specific strength requirements for heavy armor types
+
+    if (strcmp(armor->name, "Chain Mail Armor") == 0) {
+        return "13 Strength";
+    } 
+    else if (strcmp(armor->name, "Splint Armor") == 0 || strcmp(armor->name, "Plate Armor") == 0) {
+        return "15 Strength";
+    } 
+    else {
+        return " --------- "; // No strength requirement for other armors
+    }
+}
+
+char *armorStealth(struct Armor *armor) {
+
+    if(armor->stealthDisadvantage == 1) {
+        return "Disadvantage";
+    } 
+    else{
+        return " ---------- ";
+    } 
+
+}
+
 void selectArmor(struct Character *character) {
     int usersArmor;
 
     do {
         // Display armor menu
-        printf("Enter your character's armor: \n");
-        printf("1. Unarmored\n");
-        printf("___Light Armor___\n");
-        printf("2. Padded Armor\n");
-        printf("3. Leather Armor\n");
-        printf("4. Studded Leather Armor\n");
-        printf("___Medium Armor___\n");
-        printf("5. Hide Armor\n");
-        printf("6. Chain Shirt Armor\n");
-        printf("7. Scale Mail Armor\n");
-        printf("8. Breastplate Armor\n");
-        printf("9. Half Plate Armor\n");
-        printf("___Heavy Armor___\n");
-        printf("10. Ring Mail Armor\n");
-        printf("11. Chain Mail Armor\n");
-        printf("12. Splint Armor\n");
-        printf("13. Plate Armor\n");
-        printf("Enter your choice: ");
+        printf("Select Your Armor:\n");
+        printf("-------------------------------------------------------------------------------------\n");
+        printf("   %-22s |   %-6s |  %-3s | %-8s | %-12s | %-15s\n", "Name", "Type", "AC", "Dex Mod.", "Stealth", "Requirements");
+        printf("-------------------------------------------------------------------------------------\n");
+
+        for ( int i = 0; i < 9; i++) {
+            printf("%d. %-22s |  %-7s |  %-3d |    %-5d | %-12s | %-15s\n", i + 1, armors[i].name, armors[i].type, armors[i].baseAC, calculateModifier(character->dexterity), armorStealth(&armors[i]), armorRequirement(&armors[i]));
+        }
+        for (int i = 9; i < 13; i++) {
+            printf("%d. %-21s |  %-7s |  %-3d |    %-5d | %-12s | %-15s\n", i + 1, armors[i].name, armors[i].type, armors[i].baseAC, calculateModifier(character->dexterity), armorStealth(&armors[i]), armorRequirement(&armors[i]));
+        }
+        printf("-------------------------------------------------------------------------------------\n");
+        printf("\nEnter your choice: ");
         scanf("%d", &usersArmor);
 
         // Validate input
@@ -504,8 +527,14 @@ void selectArmor(struct Character *character) {
 
     // Assign selected armor
     character->armor = &armors[usersArmor - 1];
-    printf("You selected: %s\n", character->armor->name);
+    printf("You selected: %s\n\n", character->armor->name);
 }
+
+/*
+void selectWeapon(struct Characeter *character){
+
+}
+*/
 
 void selectAttributes(struct Character *character){
     int userChoice;

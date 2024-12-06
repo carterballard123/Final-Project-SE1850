@@ -1,0 +1,1 @@
+AC: %d\t+%d\n", armors[0].baseAC, calculateModifier(character->dexterity)
