@@ -132,6 +132,11 @@ const char *classes[] = {
 char *armorRequirement(struct Armor *armor);
 char *armorStealth(struct Armor *armor);
 
+//weapon validation functions
+char *weaponFinesse(struct Weapon *weapon);
+char *weaponVersatile(struct Weapon *weapon);
+char *weaponRange(struct Weapon *weapon);
+
 //selecting functions (adding updating character data)
 void selectName(struct Character *character);
 void selectShield(struct Character *character);
@@ -168,13 +173,14 @@ int main(){
 
 srand(time(NULL)); //seeds a random number
 
-char searchCharacterName[50]; //Array to store name for searching
-char updateCharacterName[50]; //Array to store name for updating
-char deleteCharacterName[50]; //Array to store name for deleting
-char diceCharacterName[50];   //Array to store name for dice rolling
+char searchCharacterName[50];   //Array to store name for searching
+char updateCharacterName[50];   //Array to store name for updating
+char deleteCharacterName[50];   //Array to store name for deleting
+char diceCharacterName[50];      //Array to store name for dice rolling
+char attackRolCharacterName[50]; //Array to store name for attack roles
 
-int choice; //users choice
-int numChoice; //users choice for dice roll
+int choice, numChoice; //users choice
+
 struct Character *characterList = NULL;
 printf("\nWelcome to the DnD Character Creator!\n\n");
 
@@ -187,7 +193,9 @@ do{
     printf("5. Delete character\n");
     printf("6. Roll a D20 with modifiers\n");
     printf("7. Roll a D20\n");
-    printf("8. Exit Dnd Character Creator\n");
+    printf("8. Make an attack role\n");
+    printf("9. Roll for damage\n");
+    printf("10. Exit Dnd Character Creator\n");
     printf("Enter your choice: ");
     scanf("%d", &choice); //user's choice
 
@@ -236,9 +244,16 @@ do{
         printf("You rolled: %d\n\n", rollD20());
     }
     if(choice == 8){
+        printf("Enter the name of your character you would like to attack with: ");
+        scanf("%s", deleteCharacterName); 
+    }
+    if(choice == 9){
+        printf("");
+    }
+    if(choice == 10){
         printf("Exiting DnD Character Creator...\n");
     }
-    if(choice > 8 || choice < 1){
+    if(choice > 10 || choice < 1){
         printf("\nInvalid choice, please try again...\n\n");
     }
 } while(choice != 8);
@@ -456,6 +471,65 @@ void deleteCharacter(struct Character **character, char *deleteCharacterName){
     printf("\nYour character has been deleted...\n\n");
 }
 
+int dmgDiceRoll(struct Weapon *weapon){
+    int weaponDMG;
+
+    if(strcmp(weapon->damageDice, "1D4") == 0){
+        weaponDMG = rollD4();
+    }
+    else if(strcmp(weapon->damageDice, "1D6") == 0){
+        weaponDMG = rollD6();
+    }
+    else if(strcmp(weapon->damageDice, "1D8") == 0){
+        weaponDMG = rollD8();
+    }
+    else if(strcmp(weapon->damageDice, "1D10") == 0){
+        weaponDMG = rollD10();
+    }
+    else if(strcmp(weapon->damageDice, "1D12") == 0){
+        weaponDMG = rollD12();
+    }
+    else if(strcmp(weapon->damageDice, "2d6") == 0){
+        weaponDMG = rollD6() + rollD6();
+    }
+    else{
+        weaponDMG = -1;
+    }
+
+return weaponDMG;
+}
+
+int attackRoll(struct Character *character, char *characterName) {
+    int dmgDice;
+
+    // Check if character or characterName is NULL
+    if (character == NULL || characterName == NULL) {
+        return -1; // Error case
+    }
+
+    // Check if the character name matches
+    if (strcmp(character->name, characterName) == 0) {
+        if (character->weapon != NULL) { // Ensure weapon is not NULL
+            if (character->weapon->isFinesse == 1) {
+                dmgDice = dmgDiceRoll(character->weapon) + calculateModifier(character->dexterity);
+            }
+            else if (character->hasShield == 0 && character->weapon->isVersatile == 1) {
+                dmgDice = dmgDiceRoll(character->weapon) + calculateModifier(character->strength);
+            }
+            else {
+                return -1; // No valid conditions met
+            }
+        } else {
+            return -1; // Weapon is NULL
+        }
+    } else {
+        return -1; // Character name does not match
+    }
+
+    return dmgDice; // Return damage dice result
+}
+
+
 //generates a random number between 1 & 20
 int rollD20(void){
     return rand() % 20 + 1;
@@ -590,7 +664,7 @@ void selectWeapon(struct Character *character){
     int usersWeapon;
 
     do{
-        // Display armor menu
+        // Display weapon menu
         printf("Select Your Weapon(s):\n");
         printf("-----------------------------------------------------------------------------------------------\n");
         printf(" %-19s |      %-9s |   %-10s | %-8s | %-5s | %-5s | %-10s \n", "Name", "Type", "DMG type", "DMG dice", "Finesse", "Versitile", "Range");
