@@ -8,7 +8,7 @@
 struct Character {
     char name[25];            //character name
     int level;                //character level
-    char class[20];           //character class
+    struct Class *class;      //character class
     char background[20];      //character background
     char race[20];            //character race
     char alignment[30];       //character alignment
@@ -23,7 +23,8 @@ struct Character {
     struct Armor *armor;      //character armor - helps determine their armor class
     struct Weapon *weapon;    //character weapon - determines how much damage a character can do
     int hasShield;            //characters has a shield or not - helps determine their armor class
-    int proficiencyModifier;  //characters current proficiency modifier
+    int proficiencyModifier;
+    int HP;  //characters current proficiency modifier
     struct Character *next;   //points to the next character in the list
 };
 
@@ -41,8 +42,8 @@ struct Weapon {
     char name[25];            // Name of the weapon (e.g., "Longsword")
     char type[25];            // Type of weapon (e.g., "Melee", "Ranged")
     char damageType[20];      // Damage type (e.g., "Slashing", "Piercing")
-    char damageDice[10];      // Damage dice (e.g., "1d8", "2d6")
-    char twoHandDamage[10];   // The Weapons damage with two hands if versatile
+    char damageDice[5];       // Damage dice (e.g., "1d8", "2d6")
+    char twoHandDamage[5];    // The Weapons damage with two hands if versatile
     int isFinesse;            // 1 if weapon uses Dex for attack/damage, 0 otherwise
     int isVersatile;          // 1 if the weapon can be used one- or two-handed
     int isTwoHanded;          // 1 if the weapon requires two hands
@@ -50,6 +51,12 @@ struct Weapon {
     int isLight;              // 1 if the weapon is light (good for dual-wielding)
     int isHeavy;              // 1 if the weapon is heavy (not for small creatures)
     int isReach;
+};
+
+struct Class {
+    char name[20];
+    char subClass[30];
+    char hitDie[10];
 };
 
 struct Armor armors[] = {
@@ -125,15 +132,26 @@ const char *backgrounds[] = {
 "Acolyte", "Artisan", "Charlatan", "Criminal", "Entertainer", "Farmer", "Guard", "Guide", "Hermit", "Merchant", "Noble", "Sage", "Sailor", "Scribe", "Soldier", "Wayfarer"
 };
 
-const char *classes[] = {
-"Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Paladin", "Ranger", "Rogue", "Sorcerer", "Warlock", "Wizard"
+const char *classes[12][5] = {
+{"Barbarian", "Path of the Berserker", "Path of the Wild Heart", "Path of the World Tree", "Path of the Zealot"},
+{"Bard", "College of Dance", "College of Glamour", "College of Lore", "College of Valor"},
+{"Cleric", "Life Domain", "Light Domain", "Trickery Domain", "War Domain"},
+{"Druid", "Circle of the Land", "Circle of the Moon", "Circle of the Sea", "Circle of the Stars"},
+{"Fighter", "Battle Master", "Champion", "Eldritch Knight", "Psi Warrior"}, 
+{"Monk", "Warrior of Mercy", "Warrior of Shadow", "Warrior of the Elements", "Warrior of the Open Hand"}, 
+{"Paladin", "Oath of Devotion", "Oath of Glory", "Oath of the Ancients", "Oath of Vengeance"}, 
+{"Ranger", "Beast Master", "Fey Wanderer", "Gloom Stalker", "Hunter"}, 
+{"Rogue", "Arcane Trickster", "Assassin", "Soulknife", "Thief"},
+{"Sorcerer", "Aberrant Sorcery", "Clockwork Sorcery", "Draconic Sorcery", "Wild Magic Sorcery"}, 
+{"Warlock", "Archfey Patron", "Celestial Patron", "Fiend Patron", "Great Old One Patron"}, 
+{"Wizard", "Abjurer", "Diviner", "Evoker", "Illusionist"}
 };
 
-//armor validation functions
+//armor functions
 char *armorRequirement(struct Armor *armor);
 char *armorStealth(struct Armor *armor);
 
-//weapon validation functions
+//weapon functions
 char *weaponFinesse(struct Weapon *weapon);
 char *weaponVersatile(struct Weapon *weapon);
 char *weaponRange(struct Weapon *weapon);
@@ -141,8 +159,9 @@ char *weaponRange(struct Weapon *weapon);
 //selecting functions (adding updating character data)
 void selectName(struct Character *character);
 void selectShield(struct Character *character);
-void selectLevel(struct Character *character);
+int selectLevel(struct Character *character);
 void selectClass(struct Character *character);
+void selectSubClass(struct Character *character);
 void selectBackground(struct Character *character);
 void selectRace(struct Character *character);
 void selectAlignment(struct Character *character);
@@ -157,6 +176,7 @@ int calculateRollModifier(struct Character *head, char *diceCharacterName, int n
 int calculateDamageDiceRoll(struct Weapon *weapon);
 int calculateDamageRoll(struct Character *character, char *characterName);
 int calculateAttackRoll(struct Character *character, char *characterName);
+int calculateHealth(struct Character *character);
 
 //display functions
 void addCharacter(struct Character **head); //adds new character to character list
@@ -344,6 +364,7 @@ int calculateRollModifier(struct Character *head, char *diceCharacterName, int n
 }
 
 void addCharacter(struct Character **newChar){
+    int userCurrLevel;
     //make space for new character in memory
     struct Character *newCharacter = (struct Character *)malloc(sizeof(struct Character));
 
@@ -356,11 +377,14 @@ void addCharacter(struct Character **newChar){
     printf("For more information regarding DnD character details visit DnD Beyond\n");
 
     printf("Enter your characters name: ");
-    scanf("%24s", newCharacter->name);
+    scanf("%20s", newCharacter->name);
     printf("Your characters name is: %s\n", newCharacter->name);
     // Calls the select functions to gather information about your character
-    selectLevel(newCharacter);
-    selectClass(newCharacter);  
+    userCurrLevel = selectLevel(newCharacter);
+    selectClass(newCharacter); 
+    if(userCurrLevel > 2){
+        selectSubClass(newCharacter);
+    }
     selectBackground(newCharacter);
     selectRace(newCharacter);
     selectAlignment(newCharacter);
@@ -371,9 +395,13 @@ void addCharacter(struct Character **newChar){
 
     newCharacter->speed = 30;
     newCharacter->proficiencyModifier = 1; ////////////////////////////////////////////////////////////////
+    newCharacter->HP = calculateHealth(newCharacter);
     //inserts the new character at the beginning of the list
     newCharacter->next = *newChar;
     *newChar = newCharacter;
+    if(newCharacter->class->subClass == NULL){
+        strcpy(newCharacter->class->subClass, "N/A");
+    }
 }
 
 void displayCharacter(struct Character *character){
@@ -389,9 +417,10 @@ void displayCharacter(struct Character *character){
     printf("List of characters:\n\n");
     while(character != NULL){
         printf("    ___________ Name: %s ___________\n\n", character->name);
-        printf("Class: %s   Level: %d   Background: %s\n\n", character->class, character->level, character->background);                                    //displays Class, Level, Background
-        printf("Race: %s    Alignment: %s\n\n", character->race, character->alignment);                                                                //displays Race, Alignment
+        printf("Class: %s   Level: %d   Background: %s\n\n", character->class->name, character->level, character->background);                                    //displays Class, Level, Background
+        printf("Sub Class: %s   Race: %s    Alignment: %s\n\n", character->class->subClass, character->race, character->alignment);                                                                //displays Race, Alignment
         printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
+        printf("Total HP: %d\n\n", character->HP);
         printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
         printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
         printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
@@ -408,16 +437,16 @@ void searchCharacter(struct Character *character, char *searchCharacterName){
 
     while(character != NULL){
         if (strcmp(character->name, searchCharacterName) == 0){
-            printf("\n    ___________ Name: %s ___________\n\n", character->name);
-            printf("Class: %s   Level: %d   Background: %s\n\n", character->class, character->level, character->background);                                    //displays Class, Level, Background
-            printf("Race: %s    Alignment: %s\n\n", character->race, character->alignment);                                                                //displays Race, Alignment
-            printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
-            printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
-            printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
-            printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
-            printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", character->intelligence, calculateModifier(character->intelligence));              //displays Intelligence
-            printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", character->wisdom, calculateModifier(character->wisdom));                                //displays Wisdom
-            printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", character->charisma, calculateModifier(character->charisma));
+            printf("    ___________ Name: %s ___________\n\n", character->name);
+        printf("Class: %s   Level: %d   Background: %s\n\n", character->class->name, character->level, character->background);                                    //displays Class, Level, Background
+        printf("Sub Class: %s   Race: %s    Alignment: %s\n\n", character->class->subClass, character->race, character->alignment);                                                                //displays Race, Alignment
+        printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
+        printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
+        printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
+        printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
+        printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", character->intelligence, calculateModifier(character->intelligence));              //displays Intelligence
+        printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", character->wisdom, calculateModifier(character->wisdom));                                //displays Wisdom
+        printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", character->charisma, calculateModifier(character->charisma));
             ifFound = 1;
             break;
         }
@@ -573,7 +602,7 @@ int calculateAttackRoll(struct Character *character, char *characterName){
     else {
         abilityModifier = character->strength;
     }
-    
+
     // Calculate and return the attack roll
     return baseRoll + calculateModifier(abilityModifier) + isProficient;
 }
@@ -601,6 +630,33 @@ int rollD6(void){
 //generates a random number between 1 & 4
 int rollD4(void){
     return rand() % 4 + 1;
+}
+
+int calculateHealth(struct Character *character){
+
+    int conMod = calculateModifier(character->constitution);
+    int charLVL = character->level;
+
+    if (!character || !character->class || !character->class->hitDie) {
+        printf("Error: Invalid character or class data.\n");
+        return -1; // Error
+    }
+
+    if(strcmp(character->class->hitDie, "1D6") == 0){
+        return (6 + conMod) + (4 * charLVL) + (conMod * charLVL);
+    }
+    else if(strcmp(character->class->hitDie, "1D8") == 0){
+        return (8 + conMod) + (5 * charLVL) + (conMod * charLVL);
+    }
+    else if(strcmp(character->class->hitDie, "1D10") == 0){
+        return (10 + conMod) + (6 * charLVL) + (conMod * charLVL);
+    }
+    else if(strcmp(character->class->hitDie, "1D12") == 0){
+        return (12 + conMod) + (7 * charLVL) + (conMod * charLVL);
+    }
+    else{
+        return -1; // Error
+    }
 }
 
 char *armorRequirement(struct Armor *armor) {
@@ -874,10 +930,18 @@ void selectClass(struct Character *character){
     int usersClass;
     int validInput = 0;
 
+if (character->class == NULL) {
+        character->class = malloc(sizeof(struct Class));
+        if (!character->class) {
+            fprintf(stderr, "Memory allocation failed!\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+
     // Display Class options
     printf("Enter your character's class:\n");
     for(int i = 0; i < 12; i++){
-        printf("%d. %s\n", i + 1, classes[i]);
+        printf("%d. %s\n", i + 1, classes[i][0]);
     }
 
     // Input validation loop
@@ -893,12 +957,70 @@ void selectClass(struct Character *character){
         }
     }
 
-    strcpy(character->class, classes[usersClass - 1]);
+    strcpy(character->class->name, classes[usersClass - 1][0]);
 
-    printf("You selected: %s\n\n", character->class);
+    printf("You selected: %s\n\n", character->class->name);
+
+    //adds hit die
+    if(strcmp(character->class->name, "Wizard") == 0 || strcmp(character->class->name, "Sorcerer") == 0){
+        strcpy(character->class->hitDie, "1D6");
+    }
+    else if(strcmp(character->class->name, "Bard") == 0 || strcmp(character->class->name, "Cleric") == 0 || strcmp(character->class->name, "Druid") == 0 || strcmp(character->class->name, "Monk") == 0 || strcmp(character->class->name, "Rogue") == 0 || strcmp(character->class->name, "Warlock") == 0){
+        strcpy(character->class->hitDie, "1D8");
+    }
+    else if(strcmp(character->class->name, "Fighter") == 0 || strcmp(character->class->name, "Paladin") == 0 || strcmp(character->class->name, "Ranger") == 0){
+        strcpy(character->class->hitDie, "1D10");
+    }
+    else if(strcmp(character->class->name, "Barbarian") == 0){
+        strcpy(character->class->hitDie, "1D12");
+    }
+    else{
+        strcpy(character->class->hitDie, "-1");
+    }
 }
 
-void selectLevel(struct Character *character){
+void selectSubClass(struct Character *character){
+    int usersSubClass, usersChoice = 0;
+    int validInput = 0;
+    int usersClass = -1;
+
+    // Display sub class options
+    printf("Enter your character's sub class:\n");
+    
+    for(int i = 0; i < 13; i++){
+        if(strcmp(character->class->name, classes[i][0]) == 0){
+            for(int j = 1; j < 5; j++){
+                usersClass = i;
+                printf("%d. %s\n", j, classes[usersClass][j]);
+            }
+            break;
+        }
+    }
+    
+    if (usersClass == -1) {
+        printf("Error: Class not found. Please ensure your character's class is valid.\n");
+        return;
+    }
+
+    // Input validation loop
+    while(!validInput){
+        printf("Enter your Choice: ");
+        scanf("%d", &usersChoice);
+
+        if(usersChoice < 1 || usersChoice > 4 || classes[usersClass][usersChoice] == NULL) {
+            printf("Invalid choice, please try again...\n\n");
+        } 
+        else{
+            validInput = 1;
+        }
+    }
+
+    strcpy(character->class->subClass, classes[usersClass][usersChoice]);
+
+    printf("You selected: %s\n\n", character->class->subClass);
+}
+
+int selectLevel(struct Character *character){
     int usersLevel, validInput = 0; // Initialize validInput to 0
 
     while(!validInput){
@@ -915,6 +1037,7 @@ void selectLevel(struct Character *character){
     character->level = usersLevel;
 
     printf("Your character is level: %d\n\n", character->level);
+    return usersLevel;
 }
 
 void selectShield(struct Character *character){
