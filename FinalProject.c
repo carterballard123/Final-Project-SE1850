@@ -177,6 +177,7 @@ int calculateDamageDiceRoll(struct Weapon *weapon);
 int calculateDamageRoll(struct Character *character, char *characterName);
 int calculateAttackRoll(struct Character *character, char *characterName);
 int calculateHealth(struct Character *character);
+int calculateProficiencyModifier(struct Character *character);
 
 //display functions
 void addCharacter(struct Character **head); //adds new character to character list
@@ -184,6 +185,7 @@ void displayCharacter(struct Character *head); //displays your characters
 void searchCharacter(struct Character *head, char *searchName); //searches for a character you have created and prints it
 void updateCharacter(struct Character *head, char *updateCharacterName); //updates an existing character with new data
 void deleteCharacter(struct Character **head, char *deleteCharacterName); //deletes an existing character
+void levelUpCharacter(struct Character *character, char *levelCharacterName);
 
 //dice rolling function
 int rollD20(void); //rolls a D20
@@ -197,6 +199,7 @@ int main(){
 
 srand(time(NULL)); //seeds a random number
 
+char levelUpCharacterName[50];
 char searchCharacterName[50];   //Array to store name for searching
 char updateCharacterName[50];   //Array to store name for updating
 char deleteCharacterName[50];   //Array to store name for deleting
@@ -213,15 +216,16 @@ printf("\nWelcome to the DnD Character Creator!\n\n");
 do{
     //menu options
     printf("1. Add a new character\n");
-    printf("2. Display character\n");
-    printf("3. Search for character\n");
-    printf("4. Update character\n");
-    printf("5. Delete character\n");
-    printf("6. Roll a D20 with modifiers\n");
-    printf("7. Roll a D20\n");
-    printf("8. Make an attack role\n");
-    printf("9. Roll for damage\n");
-    printf("10. Exit Dnd Character Creator\n");
+    printf("2. Level up your character\n");
+    printf("3. Display character\n");
+    printf("4. Search for character\n");
+    printf("5. Update character\n");
+    printf("6. Delete character\n");
+    printf("7. Roll a D20 with modifiers\n");
+    printf("8. Roll a D20\n");
+    printf("9. Make an attack role\n");
+    printf("10. Roll for damage\n");
+    printf("11. Exit Dnd Character Creator\n");
     printf("Enter your choice: ");
     scanf("%d", &choice); //user's choice
 
@@ -230,27 +234,33 @@ do{
         addCharacter(&characterList);
     }
 
-    if(choice == 2){
+    if(choice == 2) {
+        printf("Enter the name of the character to level up: ");
+        scanf("%s", levelUpCharacterName);
+        levelUpCharacter(characterList, levelUpCharacterName);
+    }
+    
+    if(choice == 3){
         displayCharacter(characterList);
     }
 
-    if(choice == 3){
+    if(choice == 4){
         printf("Enter the name of the character to search for: ");
         scanf("%s", searchCharacterName);
         searchCharacter(characterList, searchCharacterName); 
     }
 
-    if(choice == 4){
+    if(choice == 5){
         printf("Enter the name of your character to update: ");
         scanf("%s", updateCharacterName); 
         updateCharacter(characterList, updateCharacterName);
     }
-    if(choice == 5){
+    if(choice == 6){
         printf("Enter the name of your character to delete: ");
         scanf("%s", deleteCharacterName); 
         deleteCharacter(&characterList, deleteCharacterName); 
     }
-    if(choice == 6){
+    if(choice == 7){
         printf("Enter the name of your character: ");
         scanf("%s", diceCharacterName); 
         printf("Enter which modifier to add on to your roll:\n");
@@ -266,26 +276,26 @@ do{
 
         printf("You rolled: %d\n\n", calculateRollModifier(characterList, diceCharacterName, numChoice));
     }
-    if(choice == 7){
+    if(choice == 8){
         printf("You rolled: %d\n\n", rollD20());
     }
-    if(choice == 8){
+    if(choice == 9){
         printf("Enter the name of your character you would like to attack with: ");
         scanf("%s", arCharacterName);
         printf("You rolled: %d\n\n", calculateAttackRoll(characterList, arCharacterName));
     }
-    if(choice == 9){
+    if(choice == 10){
         printf("Enter the name of your character you would like roll for damage with: ");
         scanf("%s", dmgrCharacterName);
         printf("You rolled: %d\n\n", calculateDamageRoll(characterList, dmgrCharacterName));
     }
-    if(choice == 10){
+    if(choice == 11){
         printf("Exiting DnD Character Creator...\n");
     }
-    if(choice > 10 || choice < 1){
+    if(choice > 11 || choice < 1){
         printf("\nInvalid choice, please try again...\n\n");
     }
-} while(choice != 10);
+} while(choice != 11);
 
 
 struct Character *temp;
@@ -394,12 +404,12 @@ void addCharacter(struct Character **newChar){
     selectShield(newCharacter);
 
     newCharacter->speed = 30;
-    newCharacter->proficiencyModifier = 1; ////////////////////////////////////////////////////////////////
+    newCharacter->proficiencyModifier = calculateProficiencyModifier(newCharacter);
     newCharacter->HP = calculateHealth(newCharacter);
     //inserts the new character at the beginning of the list
     newCharacter->next = *newChar;
     *newChar = newCharacter;
-    if(newCharacter->class->subClass == NULL){
+    if(newCharacter->level < 3){
         strcpy(newCharacter->class->subClass, "N/A");
     }
 }
@@ -420,7 +430,7 @@ void displayCharacter(struct Character *character){
         printf("Class: %s   Level: %d   Background: %s\n\n", character->class->name, character->level, character->background);                                    //displays Class, Level, Background
         printf("Sub Class: %s   Race: %s    Alignment: %s\n\n", character->class->subClass, character->race, character->alignment);                                                                //displays Race, Alignment
         printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
-        printf("Total HP: %d\n\n", character->HP);
+        printf("Total HP: %d    Proficiency Modifier: %d\n\n", character->HP, character->proficiencyModifier);
         printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
         printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
         printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
@@ -438,15 +448,16 @@ void searchCharacter(struct Character *character, char *searchCharacterName){
     while(character != NULL){
         if (strcmp(character->name, searchCharacterName) == 0){
             printf("    ___________ Name: %s ___________\n\n", character->name);
-        printf("Class: %s   Level: %d   Background: %s\n\n", character->class->name, character->level, character->background);                                    //displays Class, Level, Background
-        printf("Sub Class: %s   Race: %s    Alignment: %s\n\n", character->class->subClass, character->race, character->alignment);                                                                //displays Race, Alignment
-        printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
-        printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
-        printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
-        printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
-        printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", character->intelligence, calculateModifier(character->intelligence));              //displays Intelligence
-        printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", character->wisdom, calculateModifier(character->wisdom));                                //displays Wisdom
-        printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", character->charisma, calculateModifier(character->charisma));
+            printf("Class: %s   Level: %d   Background: %s\n\n", character->class->name, character->level, character->background);                                    //displays Class, Level, Background
+            printf("Sub Class: %s   Race: %s    Alignment: %s\n\n", character->class->subClass, character->race, character->alignment);                                                                //displays Race, Alignment
+            printf("Armor: %s   Armor Class: %d     Weapon: %s\n\n", character->armor->name, calculateArmorClass(character->dexterity, character->armor->name, character->hasShield), character->weapon->name);   //displays Armor, Armor Class, Weapon
+            printf("Total HP: %d    Proficiency Modifier: %d\n\n", character->HP, character->proficiencyModifier);
+            printf("Strength\nAbility Score: %d\nModifier: %d\n\n", character->strength, calculateModifier(character->strength));                          //displays Strength
+            printf("Dexterity\nAbility Score: %d\nModifier: %d\n\n", character->dexterity, calculateModifier(character->dexterity));                       //displays Dexterity 
+            printf("Constitution\nAbility Score: %d\nModifier: %d\n\n", character->constitution, calculateModifier(character->constitution));              //displays Constitution
+            printf("Intelligence\nAbility Score: %d\nModifier: %d\n\n", character->intelligence, calculateModifier(character->intelligence));              //displays Intelligence
+            printf("Wisdom\nAbility Score: %d\nModifier: %d\n\n", character->wisdom, calculateModifier(character->wisdom));                                //displays Wisdom
+            printf("Charisma\nAbility Score: %d\nModifier: %d\n\n", character->charisma, calculateModifier(character->charisma));
             ifFound = 1;
             break;
         }
@@ -508,6 +519,46 @@ void deleteCharacter(struct Character **character, char *deleteCharacterName){
 
     free(temp);
     printf("\nYour character has been deleted...\n\n");
+}
+
+int calculateProficiencyModifier(struct Character *character){
+
+    return ((character->level - 1) / 4) + 2;
+}
+
+void levelUpCharacter(struct Character *character, char *levelCharacterName){
+    int userChoice;
+    int validInput = 0;
+    if (strcmp(character->name, levelCharacterName) == 0){
+        printf("Are you sure you want to level up '%s'?\n", character->name);
+        printf("1. Yes\n");
+        printf("2. No\n");
+        
+        while(!validInput){
+            printf("Enter your Choice: ");
+            scanf("%d", &userChoice);
+
+            if(userChoice != 1 && userChoice != 2) {
+                printf("Invalid choice, please try again...\n\n");
+            } 
+            else{
+                validInput = 1;
+            }
+        }
+    if(userChoice == 1){
+        character->level++;
+        printf("\n'%s' has leveled up! New level: %d\n\n", character->name, character->level);
+        if(character->level == 3){
+            printf("You have reached level 3! It's time to choose a subclass for '%s'.\n", character->name);
+            selectSubClass(character);
+        }
+        character->proficiencyModifier = calculateProficiencyModifier(character);
+        return;
+    }
+    }
+    else{
+        printf("Error: Character not found...\n\n");
+    }
 }
 
 int calculateDamageDiceRoll(struct Weapon *weapon){
