@@ -23,6 +23,7 @@ struct Character {
     struct Armor *armor;      //character armor - helps determine their armor class
     struct Weapon *weapon;    //character weapon - determines how much damage a character can do
     int hasShield;            //characters has a shield or not - helps determine their armor class
+    int proficiencyModifier;  //characters current proficiency modifier
     struct Character *next;   //points to the next character in the list
 };
 
@@ -41,7 +42,7 @@ struct Weapon {
     char type[25];            // Type of weapon (e.g., "Melee", "Ranged")
     char damageType[20];      // Damage type (e.g., "Slashing", "Piercing")
     char damageDice[10];      // Damage dice (e.g., "1d8", "2d6")
-    char twoHandDamage[10];
+    char twoHandDamage[10];   // The Weapons damage with two hands if versatile
     int isFinesse;            // 1 if weapon uses Dex for attack/damage, 0 otherwise
     int isVersatile;          // 1 if the weapon can be used one- or two-handed
     int isTwoHanded;          // 1 if the weapon requires two hands
@@ -153,6 +154,9 @@ void selectWeapon(struct Character *character);
 int calculateModifier(int attribute); //takes attributes from character and converts it to their modifier
 int calculateArmorClass(int dexterity, const char *armorName, int hasShield); //returns armor class via certain character criteria
 int calculateRollModifier(struct Character *head, char *diceCharacterName, int numChoice); //uses your characters modifiers and +/- from dice roll
+int calculateDamageDiceRoll(struct Weapon *weapon);
+int calculateDamageRoll(struct Character *character, char *characterName);
+int calculateAttackRoll(struct Character *character, char *characterName);
 
 //display functions
 void addCharacter(struct Character **head); //adds new character to character list
@@ -178,6 +182,8 @@ char updateCharacterName[50];   //Array to store name for updating
 char deleteCharacterName[50];   //Array to store name for deleting
 char diceCharacterName[50];      //Array to store name for dice rolling
 char attackRolCharacterName[50]; //Array to store name for attack roles
+char arCharacterName[50];
+char dmgrCharacterName[50];
 
 int choice, numChoice; //users choice
 
@@ -245,10 +251,13 @@ do{
     }
     if(choice == 8){
         printf("Enter the name of your character you would like to attack with: ");
-        scanf("%s", deleteCharacterName); 
+        scanf("%s", arCharacterName);
+        printf("You rolled: %d\n\n", calculateAttackRoll(characterList, arCharacterName));
     }
     if(choice == 9){
-        printf("");
+        printf("Enter the name of your character you would like roll for damage with: ");
+        scanf("%s", dmgrCharacterName);
+        printf("You rolled: %d\n\n", calculateDamageRoll(characterList, dmgrCharacterName));
     }
     if(choice == 10){
         printf("Exiting DnD Character Creator...\n");
@@ -256,7 +265,7 @@ do{
     if(choice > 10 || choice < 1){
         printf("\nInvalid choice, please try again...\n\n");
     }
-} while(choice != 8);
+} while(choice != 10);
 
 
 struct Character *temp;
@@ -361,6 +370,7 @@ void addCharacter(struct Character **newChar){
     selectShield(newCharacter);
 
     newCharacter->speed = 30;
+    newCharacter->proficiencyModifier = 1; ////////////////////////////////////////////////////////////////
     //inserts the new character at the beginning of the list
     newCharacter->next = *newChar;
     *newChar = newCharacter;
@@ -471,35 +481,36 @@ void deleteCharacter(struct Character **character, char *deleteCharacterName){
     printf("\nYour character has been deleted...\n\n");
 }
 
-int dmgDiceRoll(struct Weapon *weapon){
-    int weaponDMG;
+int calculateDamageDiceRoll(struct Weapon *weapon){
 
-    if(strcmp(weapon->damageDice, "1D4") == 0){
-        weaponDMG = rollD4();
-    }
-    else if(strcmp(weapon->damageDice, "1D6") == 0){
-        weaponDMG = rollD6();
-    }
-    else if(strcmp(weapon->damageDice, "1D8") == 0){
-        weaponDMG = rollD8();
-    }
-    else if(strcmp(weapon->damageDice, "1D10") == 0){
-        weaponDMG = rollD10();
-    }
-    else if(strcmp(weapon->damageDice, "1D12") == 0){
-        weaponDMG = rollD12();
-    }
-    else if(strcmp(weapon->damageDice, "2d6") == 0){
-        weaponDMG = rollD6() + rollD6();
-    }
-    else{
-        weaponDMG = -1;
-    }
+    if (!weapon || !weapon->damageDice){
+            return -1; // Error: Null pointer
+        }
 
-return weaponDMG;
+        if (strcasecmp(weapon->damageDice, "1D4") == 0){
+            return rollD4();
+        } 
+        else if (strcasecmp(weapon->damageDice, "1D6") == 0){
+            return rollD6();
+        } 
+        else if (strcasecmp(weapon->damageDice, "1D8") == 0){
+            return rollD8();
+        } 
+        else if (strcasecmp(weapon->damageDice, "1D10") == 0){
+            return rollD10();
+        } 
+        else if (strcasecmp(weapon->damageDice, "1D12") == 0){
+            return rollD12();
+        } 
+        else if (strcasecmp(weapon->damageDice, "2D6") == 0){
+            return rollD6() + rollD6();
+        } 
+        else{
+            return -1; // Error: Unknown dice type
+        }
 }
 
-int attackRoll(struct Character *character, char *characterName) {
+int calculateDamageRoll(struct Character *character, char *characterName) {
     int dmgDice;
 
     // Check if character or characterName is NULL
@@ -509,26 +520,63 @@ int attackRoll(struct Character *character, char *characterName) {
 
     // Check if the character name matches
     if (strcmp(character->name, characterName) == 0) {
-        if (character->weapon != NULL) { // Ensure weapon is not NULL
-            if (character->weapon->isFinesse == 1) {
-                dmgDice = dmgDiceRoll(character->weapon) + calculateModifier(character->dexterity);
+        // Ensure weapon is not NULL
+        if (character->weapon != NULL) {
+            struct Weapon *weapon = character->weapon;
+
+            // Handle finesse property
+            if (weapon->isFinesse == 1) {
+                dmgDice = calculateDamageDiceRoll(weapon) + calculateModifier(character->dexterity);
             }
-            else if (character->hasShield == 0 && character->weapon->isVersatile == 1) {
-                dmgDice = dmgDiceRoll(character->weapon) + calculateModifier(character->strength);
+            // Handle versatile property
+            else if (weapon->isVersatile == 1){
+                if (character->hasShield == 0){
+                    // Use two-handed damage dice
+                    dmgDice = calculateDamageDiceRoll(weapon) + calculateModifier(character->strength);
+                } 
+                else {
+                    // Use standard one-handed damage dice
+                    dmgDice = calculateDamageDiceRoll(weapon) + calculateModifier(character->strength);
+                }
             }
+            // Handle standard strength-based attacks
             else {
-                return -1; // No valid conditions met
+                dmgDice = calculateDamageDiceRoll(weapon) + calculateModifier(character->strength);
             }
-        } else {
+        } 
+        else {
             return -1; // Weapon is NULL
         }
-    } else {
+    } 
+    else {
         return -1; // Character name does not match
     }
 
-    return dmgDice; // Return damage dice result
+    return dmgDice; // Return damage dealt
 }
 
+int calculateAttackRoll(struct Character *character, char *characterName){
+
+    if (character == NULL || characterName == NULL || character->weapon == NULL) {
+        return -1; // Error case
+    }
+
+    // Base roll
+    int baseRoll = rollD20();
+    int abilityModifier;
+    int isProficient = character->proficiencyModifier;
+
+    // Determine which ability modifier to use
+    if (character->weapon->isFinesse == 1 || strcmp(character->weapon->type, "Ranged") == 0 || (strcmp(character->weapon->type, "Melee/Ranged") == 0 && character->weapon->isFinesse == 1)) {
+        abilityModifier = character->dexterity;
+    } 
+    else {
+        abilityModifier = character->strength;
+    }
+    
+    // Calculate and return the attack roll
+    return baseRoll + calculateModifier(abilityModifier) + isProficient;
+}
 
 //generates a random number between 1 & 20
 int rollD20(void){
